@@ -1,13 +1,16 @@
-package com.yash.expensesheet.services;
+package com.yash.ExpenseClaims.services;
 
-import com.yash.expensesheet.dto.UserDto;
-import com.yash.expensesheet.mappers.UserMapper;
-import com.yash.expensesheet.repositories.UserRepository;
+import com.yash.ExpenseClaims.dto.UserDto;
+import com.yash.ExpenseClaims.mappers.UserMapper;
+import com.yash.ExpenseClaims.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -17,19 +20,16 @@ public class UserService {
     @Autowired
     private UserMapper userMapper;
 
-    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private UserDto userDto;
 
     public UserDto createUser(UserDto user) {
-        String pwd = passwordEncoder.encode(user.getPassword());
-        user.setPassword("{bcrypt}" + pwd);
         UserDetails userDetails = userMapper.mapToDomain(user);
         userRepository.createUser(userDetails);
         return userMapper.mapToDto(userDetails);
     }
 
     @PreAuthorize("hasRole('admin')")
-    public void deleteUser(String username) throws Exception {
+    public void deleteUser(String username) {
         userRepository.deleteUser(username);
     }
 
@@ -37,6 +37,19 @@ public class UserService {
         user.setUserName(username);
         UserDetails userDetails = userMapper.mapToDomain(user);
         userRepository.updateUser(userDetails);
+        return userMapper.mapToDto(userDetails);
+    }
+
+    public List<UserDto> getAllUsers() {
+        List<UserDetails> users = userRepository.getAllUsers();
+        return users
+                .stream()
+                .map(user -> userMapper.mapToDto(user))
+                .collect(Collectors.toList());
+    }
+
+    public UserDto getUserByUserName(String username) {
+        UserDetails userDetails = userRepository.getUserByUserName(username);
         return userMapper.mapToDto(userDetails);
     }
 }

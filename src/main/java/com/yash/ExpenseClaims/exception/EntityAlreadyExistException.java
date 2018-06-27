@@ -1,4 +1,4 @@
-package com.yash.expensesheet.exception;
+package com.yash.ExpenseClaims.exception;
 
 import org.springframework.web.server.ResponseStatusException;
 

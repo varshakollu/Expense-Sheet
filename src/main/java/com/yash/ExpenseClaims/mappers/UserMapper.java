@@ -1,6 +1,6 @@
-package com.yash.expensesheet.mappers;
+package com.yash.ExpenseClaims.mappers;
 
-import com.yash.expensesheet.dto.UserDto;
+import com.yash.ExpenseClaims.dto.UserDto;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;

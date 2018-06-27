@@ -1,6 +1,7 @@
-package com.yash.expensesheet.dto;
+package com.yash.ExpenseClaims.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -10,6 +11,9 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 @JsonInclude(NON_NULL)
 public class UserDto implements Serializable {
+
+    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
     @NotNull
     @NotEmpty
     private String userName;
@@ -32,7 +36,8 @@ public class UserDto implements Serializable {
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        String pwd = passwordEncoder.encode(password);
+        this.password = "{bcrypt}" + pwd;
     }
 
     public Boolean getEnabled() {
