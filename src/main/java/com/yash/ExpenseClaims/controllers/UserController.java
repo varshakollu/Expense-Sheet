@@ -21,9 +21,9 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-
     @RequestMapping(value = "/users", method = POST)
     public UserDto createUser(@RequestBody UserDto userDto) {
+        getUsers();
         return userService.createUser(userDto);
     }
 

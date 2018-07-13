@@ -3,6 +3,7 @@
 const path = require('path');
 
 module.exports = {
+  mode:"development",
   entry: './lib/home-page.js',
   output: {
     filename: 'bundle.js',
@@ -22,8 +23,20 @@ module.exports = {
             }
           }
         ]
+      },
+      {
+        test: /\.css$/,
+        use: [
+          'style-loader',
+          'css-loader'
+        ]
+      },
+      {
+        test: /\.jpg$/,
+        use:[
+          'file-loader'
+        ]
       }
     ]
   },
-
 };

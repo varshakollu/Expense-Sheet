@@ -20,7 +20,8 @@ public class UserService {
     @Autowired
     private UserMapper userMapper;
 
-    private UserDto userDto;
+    @Autowired
+    private UserService userService;
 
     public UserDto createUser(UserDto user) {
         UserDetails userDetails = userMapper.mapToDomain(user);
@@ -49,6 +50,7 @@ public class UserService {
     }
 
     public UserDto getUserByUserName(String username) {
+
         UserDetails userDetails = userRepository.getUserByUserName(username);
         return userMapper.mapToDto(userDetails);
     }

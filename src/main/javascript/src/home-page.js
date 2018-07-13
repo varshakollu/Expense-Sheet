@@ -1,77 +1,43 @@
 import ReactDOM from "react-dom";
 import React, { Component } from "react";
-import {
-  Route,
-  NavLink,
-  HashRouter
-} from "react-router-dom";
-import SideNav, { Nav, NavIcon, NavText } from 'react-sidenav';
-import createUser from "./createUser";
-import updateUser from "./updateUser";
-import deleteUser from "./deleteUser";
+import { Router, Route, browserHistory, IndexRoute } from "react-router-dom";
+import createBrowserHistory from "history/createBrowserHistory";
 
-const ulStyle = {
-  listStyleType: 'none',
-  margin: '0',
-  padding: '0',
-  width: '200px',
-  backgroundColor: '#f1f1f1'
-}
 
-const navlinkStyle = {
-  display: 'block',
-  color: '#000',
-  padding: '8px 16px',
-  textDecoration: 'none'
-}
 
-const MySideNav = () => (
-  <div style={{background: '#2c3e50', color: '#FFF', width: 220}}> 
-      <SideNav highlightColor='#E91E63' highlightBgColor='#00bcd4' defaultSelected='sales'>       
-          <Nav id='dashboard'>
-              <NavText> Dashboard </NavText>
-          </Nav>
-          <Nav id='sales'>
-              <NavText> Sales </NavText>
-          </Nav>
-      </SideNav>
-  </div>
-)
+import { Home } from "./components/Home";
+import { Upload } from "./components/Upload";
+import { Check_status } from "./components/Check_status";
+import { Approve_Expenses } from "./components/Approve_Expenses";
+import { Greeting } from "./components/Greeting";
+
 
 class ExpenseSheet extends React.Component {
+    constructor(props) {
+        super(props);
+        console.log(window)
+        props = window.props;
+    }
     render() {
-        return (
-          //   <HashRouter>
-          //   <div>
-          //     <ul style={ulStyle}>
-          //       <li><NavLink style={navlinkStyle} to="/create_user">Create User</NavLink></li>
-          //       <li><NavLink style={navlinkStyle} to="/update_user">Update User</NavLink></li>
-          //       <li><NavLink style={navlinkStyle} to="/delete_user">Delete User</NavLink></li>
-          //     </ul>
-          //     <div>
-          //       <Route path="/create_user" component={createUser}/>
-          //       <Route path="/update_user" component={updateUser}/>
-          //       <Route path="/delete_user" component={deleteUser}/>
-          //     </div>
-          //   </div>
-          // </HashRouter> 
+        var history = createBrowserHistory();
 
-<div style={{background: '#2c3e50', color: '#FFF', width: 220}}> 
-      <SideNav highlightColor='#E91E63' >       
-          <Nav id='create_user'>
-              <NavText> Create User </NavText>
-          </Nav>
-          <Nav id='update_user'>
-              <NavText> Update User </NavText>
-          </Nav>
-          <Nav id='delete_user'>
-              <NavText> Delete User </NavText>
-          </Nav>
-      </SideNav>
-  </div>
-          
-          
-        );
+        return (
+            <Router history={history}>
+                <div>
+                    {/* <Route path={"/"} component={Home} >
+                        <IndexRoute component={Home} />
+                        <Route path={"upload"} component={Upload} />
+                        <Route path={"status"} component={Check_status} />
+                    </Route> */}
+                    <Route path={"/"} component={Home} />
+                    <Route path={"/home"} component={Greeting} />
+                    <Route path={"/upload"} component={Upload} />
+                    <Route path={"/status"} component={Check_status} />
+                    <Route path={"/approve"} component={Approve_Expenses} />
+
+                </div>
+            </Router>
+        )
     }
 }
 

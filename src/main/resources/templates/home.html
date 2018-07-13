@@ -1,16 +1,23 @@
-<html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
-    <script >
-        window.props = {
-            user: {
-                userName: 'raghava',
-                roles: ['admin','customer']
-            }
-        };
-    </script>
-    <title>Welcome</title>
+    <title>Expense Reimbursement</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script th:inline="javascript">
+
+      /*<![CDATA[*/
+	     window.props = {};
+         window.props.userName =  /*[[${currentUser}]]*/ ;
+       /*]]>*/
+</script>
 </head>
 <body>
+
+
+<div id="container">
+
+</div>
 </body>
-<script src="js/app.js"></script>
+<script src="js/bundle.js"></script>
 </html>

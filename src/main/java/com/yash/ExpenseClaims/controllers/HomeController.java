@@ -22,7 +22,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.joining;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @Controller
@@ -35,23 +37,29 @@ public class HomeController {
                 .filter(auth -> auth.getAuthority().equalsIgnoreCase("ROLE_admin"))
                 .findFirst();
 
+
         ModelMap model = new ModelMap();
-        model.put("user", authentication.getPrincipal());
+        model.addAttribute("currentUser",authentication.getName());
+        model.addAttribute("rootScript", getRootScript(authentication.getName(),
+                authentication.getAuthorities()
+                        .stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .collect(Collectors.toList())
+        ));
+
+
         return new ModelAndView("home", model);
     }
 
-    @RequestMapping("/userCreateView")
-    public String usercreationview(Model model) {
-        return "createUser";
-    }
-
-    @RequestMapping("/userUpdateView")
-    public String userUpdateView(Model model) {
-        return "updateUser";
-    }
-
-    @RequestMapping("/userDeleteView")
-    public String userDeleteView(Model model) {
-        return "deleteUser";
+    private String getRootScript(String userName, List<String> roles) {
+        StringBuilder sb = new StringBuilder("window.props={");
+        sb.append("username:\"" + userName + "\",");
+        sb.append("roles: [");
+        sb.append(roles.stream()
+                .map(t -> "\"" + t + "\"")
+                .collect(joining(",")));
+        sb.append("]");
+        sb.append("}");
+        return sb.toString();
     }
 }
