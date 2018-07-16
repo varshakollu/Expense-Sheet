@@ -1,18 +1,18 @@
 import ReactDOM from "react-dom";
 import React, { Component } from "react";
-import image from "./images/expense-report.jpg";
-
+  
 export class Header extends React.Component {
 
     render() {
+        const myImage = "./yash-logo.jpg";
         return (
             <nav className="navbar navbar-default">
                 <div className="container-fluid">
                     <div className="navbar-header">
-                        <img src={image} alt="Yash Technologies" />
+                        <img src={myImage} alt="Yash Technologies" />
                     </div>
                     <ul className="nav navbar-nav">
-                        <li><h5>Expense Reimbursement system </h5></li>
+                        <li><p className="titleStyle">Expense Reimbursement System </p></li>
                     </ul>
                     <ul className="nav navbar-nav navbar-right">
                         <li><a href="#"><span className="glyphicon glyphicon-log-out"></span>Logout</a></li>

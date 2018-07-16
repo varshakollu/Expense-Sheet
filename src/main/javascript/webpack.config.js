@@ -1,5 +1,3 @@
-// var ExtractTextPlugin = require('extract-text-webpack-plugin');
-// var StaticSiteGeneratorPlugin = require('static-site-generator-webpack-plugin');
 const path = require('path');
 
 module.exports = {
@@ -12,27 +10,8 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /.\css$/,
-        include: "/src",
-        use: [
-          'style-loader',
-          {
-            loader: 'css-loader',
-            options: {
-              modules: true
-            }
-          }
-        ]
-      },
-      {
-        test: /\.css$/,
-        use: [
-          'style-loader',
-          'css-loader'
-        ]
-      },
-      {
         test: /\.jpg$/,
+        exclude: /(node_modules)/,
         use:[
           'file-loader'
         ]

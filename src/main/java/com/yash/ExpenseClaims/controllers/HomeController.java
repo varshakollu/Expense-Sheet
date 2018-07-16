@@ -37,7 +37,6 @@ public class HomeController {
                 .filter(auth -> auth.getAuthority().equalsIgnoreCase("ROLE_admin"))
                 .findFirst();
 
-
         ModelMap model = new ModelMap();
         model.addAttribute("currentUser",authentication.getName());
         model.addAttribute("rootScript", getRootScript(authentication.getName(),
