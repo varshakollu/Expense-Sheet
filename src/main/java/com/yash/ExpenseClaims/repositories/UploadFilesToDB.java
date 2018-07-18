@@ -37,7 +37,7 @@ public class UploadFilesToDB {
 
     public List<ExpenseDto> retrieveAllExpenses(String username){
 
-        String sql = "select expenseID,amount,reason,approvalStatus from Expenses where userName = '"+username +"';";
+        String sql = "select expenseID,amount,reason,approvalStatus from expenses where userName = '"+username +"';";
 
         List<ExpenseDto> list = jdbcTemplate.query(sql, new RowMapper<ExpenseDto>(){
 

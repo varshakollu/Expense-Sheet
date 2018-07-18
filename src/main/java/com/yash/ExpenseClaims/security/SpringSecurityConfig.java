@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 import static org.springframework.http.HttpMethod.DELETE;
@@ -26,14 +27,17 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-        http.csrf()
-                .disable()
-                .authorizeRequests()
+            http.authorizeRequests()
                 .antMatchers(POST,"/users").hasAnyRole("admin")
                 .antMatchers(PUT,"/users").hasAnyRole("admin")
                 .antMatchers(DELETE,"/users").hasAnyRole("admin")
                 .anyRequest().authenticated()
-                .and().httpBasic();
+                .and().httpBasic()
+                .and().logout().permitAll()
+                    .deleteCookies("JSESSIONID")
+                .logoutSuccessHandler((httpServletRequest, httpServletResponse, authentication) -> {
+            httpServletResponse.setStatus(HttpServletResponse.SC_OK);
+        });
 
     }
 

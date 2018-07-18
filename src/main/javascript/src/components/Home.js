@@ -11,19 +11,34 @@ export class Home extends React.Component {
 
     render() {
         const currentLoggedinUsername = props.userName;
-
-        if (currentLoggedinUsername == "raghava") {
+        const currentLoggedinUserRoles = props.userRoles;
+        
+        if (currentLoggedinUserRoles == "ROLE_admin") {
             return (
                 <div style={{ flex: 1, padding: "10px" }}>
                     <Header />
                     <SideBarNavigation_admin />
                 </div>);
-        } else if(currentLoggedinUsername == "usertest"){
+        } else if(currentLoggedinUserRoles == "ROLE_employee"){
             return (
                 <div style={{ flex: 1, padding: "10px" }}>
                     <Header />
                     <SideBarNavigation_employee />
                 </div>);
         }
+        
+        // if (currentLoggedinUsername == "raghava") {
+        //     return (
+        //         <div style={{ flex: 1, padding: "10px" }}>
+        //             <Header />
+        //             <SideBarNavigation_admin />
+        //         </div>);
+        // } else if(currentLoggedinUsername == "usertest"){
+        //     return (
+        //         <div style={{ flex: 1, padding: "10px" }}>
+        //             <Header />
+        //             <SideBarNavigation_employee />
+        //         </div>);
+        // }
     }
 }
