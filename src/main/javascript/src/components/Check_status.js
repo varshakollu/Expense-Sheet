@@ -1,64 +1,139 @@
 import React from "react";
 import { css } from 'glamor';
+import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
+import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
+import moment from 'moment';
+import Helmet from 'react-helmet';
+import DayPickerInput from 'react-day-picker/DayPickerInput';
+import 'react-day-picker/lib/style.css';
+import { formatDate, parseDate } from 'react-day-picker/moment';
 
 export class Check_status extends React.Component {
 
-    constructor(props){
+    constructor(props) {
         super(props);
         props = window.props;
+        this.handleFromChange = this.handleFromChange.bind(this);
+        this.handleToChange = this.handleToChange.bind(this);
         this.state = {
-            statuses : [],
+            statuses: [],
+            from: undefined,
+            to: undefined,
         };
     }
 
-    componentWillMount(){
+    showFromMonth() {
+        const { from, to } = this.state;
+        if (!from) {
+            return;
+        }
+        if (moment(to).diff(moment(from), 'months') < 2) {
+            this.to.getDayPicker().showMonth(from);
+        }
+    }
+    handleFromChange(from) {
+        this.setState({ from });
+    }
+    handleToChange(to) {
+        this.setState({ to }, this.showFromMonth);
+    }
+
+    componentWillMount() {
         const currentLoggedinUsername = props.userName;
-        fetch("/checkstatus/"+currentLoggedinUsername,{
+        fetch("/checkstatus/" + currentLoggedinUsername, {
             credentials: "same-origin"
-          })
+        })
             .then(res => res.json())
             .then(res => {
                 this.setState({
-                    statuses : res
+                    statuses: res
                 });
             });
     }
 
     render() {
-
-        const tableStyle = css({
-            width: '50%',
-            marginLeft: '25%'
-        });
-
-        if (this.state.statuses.length !== 0) {
+        const { from, to } = this.state;
+        const modifiers = { start: from, end: to };
         return (
             <div>
-                <table {...tableStyle} className="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th scope="col">Expense ID</th>
-                            <th scope="col">Total Amount</th>
-                            <th scope="col">Reason for Expense</th>
-                            <th scope="col">Status</th>
-                        </tr>    
-                    </thead>
-                    <tbody>
-                    {this.state.statuses.map((p) =>
-                       <tr scope="row">
-                            <td>{p.expenseID}</td>
-                            <td>{p.amount}</td>
-                            <td>{p.reason}</td>
-                            <td>{p.approvalStatus}</td>
-                       </tr>
-                    )}      
-                    </tbody>        
-                </table>
-            </div>);
-        } else if(this.state.statuses.length == 0){
-            return (
-                <h3> Sorry, you have never uploaded bills using this system </h3>
+                <h3>Check status of previously uploaded bills</h3>
+                <div className="InputFromTo">
+                    <DayPickerInput
+                        value={from}
+                        placeholder="From"
+                        format="LL"
+                        formatDate={formatDate}
+                        parseDate={parseDate}
+                        dayPickerProps={{
+                            selectedDays: [from, { from, to }],
+                            disabledDays: { after: to },
+                            toMonth: to,
+                            modifiers,
+                            numberOfMonths: 2,
+                            onDayClick: () => this.to.getInput().focus(),
+                        }}
+                        onDayChange={this.handleFromChange}
+                    />{' '}
+                    —{' '}
+                    <span className="InputFromTo-to">
+                        <DayPickerInput
+                            ref={el => (this.to = el)}
+                            value={to}
+                            placeholder="To"
+                            format="LL"
+                            formatDate={formatDate}
+                            parseDate={parseDate}
+                            dayPickerProps={{
+                                selectedDays: [from, { from, to }],
+                                disabledDays: { before: from },
+                                modifiers,
+                                month: from,
+                                fromMonth: from,
+                                numberOfMonths: 2,
+                            }}
+                            onDayChange={this.handleToChange}
+                        />
+                    </span>
+                    <Helmet>
+                        <style>{`
+  .InputFromTo .DayPicker-Day--selected:not(.DayPicker-Day--start):not(.DayPicker-Day--end):not(.DayPicker-Day--outside) {
+    background-color: #f0f8ff !important;
+    color: #4a90e2;
+  }
+  .InputFromTo .DayPicker-Day {
+    border-radius: 0 !important;
+  }
+  .InputFromTo .DayPicker-Day--start {
+    border-top-left-radius: 50% !important;
+    border-bottom-left-radius: 50% !important;
+  }
+  .InputFromTo .DayPicker-Day--end {
+    border-top-right-radius: 50% !important;
+    border-bottom-right-radius: 50% !important;
+  }
+  .InputFromTo .DayPickerInput-Overlay {
+    width: 550px;
+  }
+  .InputFromTo-to .DayPickerInput-Overlay {
+    margin-left: -198px;
+  }
+`}</style>
+                    </Helmet>
+                </div>
+                <div>
+                    <BootstrapTable ref='table' data={this.state.statuses}
+                        tableStyle={{ paddingLeft: '20%' }} condensed>
+                        <TableHeaderColumn dataField='submittedDate' dataAlign='center'
+                            filter={{ type: 'DateFilter' }} isKey>Creation Date</TableHeaderColumn>
+                        <TableHeaderColumn dataField='amount' dataAlign='center'
+                            filter={{ type: 'NumberFilter' }}>Total Amount</TableHeaderColumn>
+                        <TableHeaderColumn dataField='reason' dataAlign='center'
+                            filter={{ type: 'TextFilter' }}>Reason for Expense</TableHeaderColumn>
+                        <TableHeaderColumn dataField='approvalStatus' dataAlign='center'
+                            filter={{ type: 'TextFilter' }}>Status</TableHeaderColumn>
+                    </BootstrapTable>
+                </div>
+            </div>
         );
-        }
     }
 }

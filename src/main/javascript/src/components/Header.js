@@ -1,20 +1,11 @@
-import ReactDOM from "react-dom";
-import React, { Component } from "react";
+import React from "react";
 import { css } from 'glamor';
 
 export class Header extends React.Component {
 
     render() {
 
-        const myImage = "./yash-logo.jpg";
-
-        const userInfoStyle = css({
-            color: 'white',
-            fontFamily: 'source_sans_proregular',
-            fontStyle: 'normal',
-            fontSize: '125%',
-            marginTop: '15%',
-        });
+        const myImage = "./yash-logo.png";
 
         const headerStyle = css({
             backgroundColor: '#01498B',
@@ -39,17 +30,34 @@ export class Header extends React.Component {
             marginTop: '10px'
         });
 
+        const iconStyles = css({
+            color: 'white',
+            marginRight: '5px'
+        });
+
+        const dropDownMenuStyle = css({
+            fontSize: 'large',
+            textAlign: 'center'
+        });
+
+
         return (
-            <nav className="navbar navbar-default">
+            <nav className="navbar navbar-light">
                 <div {...headerStyle} className="container-fluid">
                     <ul className="nav navbar-nav">
                         <li><img {...imageStyle} src={myImage} alt="Yash Technologies" /></li>
                         <li><p {...titleStyle}>Expense Reimbursement System </p></li>
                     </ul>
-                    <ul className="nav navbar-nav navbar-right">
-                        <li><p {...userInfoStyle}>Hello {props.userName} </p></li>
-                        <li><a href="/logout" ><span className="glyphicon glyphicon-log-out"></span>Logout</a></li>
-                    </ul>
+                    <div class="btn-group nav navbar-nav navbar-right">
+                        <button type="button" class="btn btn-danger btn-secondary btn-md dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span className="glyphicon glyphicon-user" {...iconStyles}></span>
+                            {props.userName}
+                        </button>
+                        <div class="dropdown-menu" {...dropDownMenuStyle}>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#"> <span className="glyphicon glyphicon-log-out"></span> Sign out</a>
+                        </div>
+                    </div>
                 </div>
             </nav>
         );

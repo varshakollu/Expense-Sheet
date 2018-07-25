@@ -5,8 +5,9 @@ export class Help extends React.Component {
     render() {
 
         const divStyle = css({
-            marginTop: '-2%',
-            marginLeft: '20%'
+            marginLeft: '20%',
+            marginRight: '5%',
+            textAlign: 'justify'
         });
 
         const impHelpStyle = css({

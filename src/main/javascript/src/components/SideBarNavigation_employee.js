@@ -31,7 +31,6 @@ export class SideBarNavigation_employee extends React.Component {
                 float: "left",
                 width: "15%",
                 height: "100%",
-                marginTop: "-2%",
                 backgroundColor: '#01498B'
             }}>
 

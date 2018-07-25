@@ -66,7 +66,6 @@ export class SideBarNavigation_admin extends React.Component {
                         </Link>
                     </li>
                 </ul>
-
             </div>
         );
     }
