@@ -11,8 +11,12 @@
   "license": "ISC",
   "dependencies": {
     "glamor": "^2.20.40",
+    "moment": "^2.22.2",
     "react": "^16.4.1",
+    "react-bootstrap-table": "^4.3.1",
+    "react-day-picker": "^7.1.10",
     "react-dom": "^16.4.1",
+    "react-helmet": "^5.2.0",
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
     "react-sidenav": "^2.1.3",
