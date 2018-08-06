@@ -12,13 +12,10 @@ import java.io.IOException;
 @Controller
 public class HomeController {
 
-    public boolean isLoogedIn = false;
-
     @GetMapping("/")
     public ModelAndView homeView(Authentication authentication) throws IOException {
         String userName = authentication.getName();
         String newUserName = userName.substring(0, 1).toUpperCase() + userName.substring(1).toLowerCase();
-        isLoogedIn = true;
         ModelMap model = new ModelMap();
         model.addAttribute("currentUserRoles", authentication.getAuthorities().toArray()[0].toString());
         model.addAttribute("currentUser", newUserName);
@@ -27,10 +24,8 @@ public class HomeController {
 
     @RequestMapping(value = "/login", method = RequestMethod.GET)
     public ModelAndView login() {
-
             ModelAndView modelAndView = new ModelAndView();
             modelAndView.setViewName("login");
             return modelAndView;
-
     }
 }

@@ -86,17 +86,21 @@ export class Upload extends React.Component {
                 var confirmMessage = confirm("Please upload an Expense sheet in .xls or .xlsx or .csv format.");
                 if (confirmMessage) {
                     var tempExpenseName = this.state.name;
+                    var tempArray = this.state.files;
                     this.setState(initialState);
                     this.setState({
                         name: tempExpenseName,
-                        disableUpload: false
+                        disableUpload: false,
+                        files : tempArray
                     });
                 } else {
                     var tempExpenseName = this.state.name;
+                    var tempArray = this.state.files;
                     this.setState(initialState);
                     this.setState({
                         name: tempExpenseName,
-                        disableUpload: false
+                        disableUpload: false,
+                        files : tempArray
                     });
                 }
             }
@@ -165,19 +169,22 @@ export class Upload extends React.Component {
             var confirmMessage = confirm("Please upload all appropriate bills.");
             if (confirmMessage) {
                 var tempExpenseName = this.state.name;
-                this.setState(initialState);
-                this.setState({
-                    name: tempExpenseName,
-                    disableUpload: false
-                });
-
+                    var tempArray = this.state.files;
+                    this.setState(initialState);
+                    this.setState({
+                        name: tempExpenseName,
+                        disableUpload: false,
+                        files : tempArray
+                    });
             } else {
                 var tempExpenseName = this.state.name;
-                this.setState(initialState);
-                this.setState({
-                    name: tempExpenseName,
-                    disableUpload: false
-                });
+                    var tempArray = this.state.files;
+                    this.setState(initialState);
+                    this.setState({
+                        name: tempExpenseName,
+                        disableUpload: false,
+                        files : tempArray
+                    });
             }
         }
         else if (this.state.countOfExcelFiles == 1 && this.state.countOfBills >= 1) {
