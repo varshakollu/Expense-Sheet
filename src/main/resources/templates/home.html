@@ -1,6 +1,17 @@
 <html xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
+
     <title>Expense Reimbursement</title>
+
+    <meta Http-Equiv="Cache-Control" Content="no-cache">
+    <meta Http-Equiv="Pragma" Content="no-cache">
+    <meta Http-Equiv="Expires" Content="0">
+
+    <script src="https://unpkg.com/react-day-picker/lib/daypicker.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.3.5/bluebird.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/react-day-picker/lib/style.css">
+    <link rel="stylesheet"
+          href="https://npmcdn.com/react-bootstrap-table/dist/react-bootstrap-table-all.min.css"></link>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -13,11 +24,80 @@
        /*]]>*/
 
     </script>
+
+    <script type="text/javascript">
+        function Clear() {
+            console.log("hi tets");
+            var Backlen=history.length;
+            history.go(-Backlen);
+            window.location.replace('login.html');
+        }
+</script>
+    <style>
+
+    #headerStyle {
+        background-color: #01498B;
+        margin-bottom: 0;
+        border: none;
+        min-height: 65px;
+        border-radius: 0;
+        border-bottom: 6px solid #48BED7;
+    }
+
+    #titleStyle{
+         font-family: source_sans_proregular;
+            font-style: normal;
+            font-size: 25px;
+            font-weight: 300;
+            margin-top: 10px;
+            margin-left: 50px;
+            color: white;
+    }
+
+    #imageStyle{
+            margin-top: 10px;
+    }
+
+    #iconStyles{
+            color: white;
+            margin-right: 5px;
+    }
+
+    #dropDownMenuStyle{
+            font-size: large;
+            text-align: center;
+    }
+
+    </style>
 </head>
 <body style="background-color:#fcf8e387">
 
-<div id="container">
+    <nav class="navbar navbar-light">
+        <div id="headerStyle" class="container-fluid">
+            <ul class="nav navbar-nav">
+                <li><img id="imageStyle" src="yash-logo.png" alt="Yash Technologies"/></li>
+                <li><p id="titleStyle">Expense Reimbursement System </p></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <button type="button" style="margin-top: 10px" class="btn btn-danger btn-secondary btn-md dropdown-toggle" data-toggle="dropdown"
+                         th:text="${currentUser}"  aria-haspopup="true" aria-expanded="false">
+                        <span style="color:white; margin-right: 5px" class="glyphicon glyphicon-user"></span>
 
+                    </button>
+                    <ul class="dropdown-menu">
+                        <form id="form1" th:action="@{/logout}" method="POST">
+                            <span style="color:blue; margin-left: 10px; margin-top:5px" class="glyphicon glyphicon-log-out"></span>
+                            <a href="javascript:" onclick="document.getElementById('form1').submit();">Log Out</a>
+                        </form>
+                    </ul>
+                </li>
+            </ul>
+
+        </div>
+    </nav>
+
+<div id="container">
 </div>
 </body>
 <script src="js/bundle.js"></script>

@@ -1,7 +1,6 @@
 import ReactDOM from "react-dom";
 import React from "react";
 import { Route, HashRouter, Redirect } from "react-router-dom";
-
 import { Home } from "./components/Home";
 import { Upload } from "./components/Upload";
 import { Check_status } from "./components/Check_status";
@@ -17,8 +16,7 @@ class ExpenseSheet extends React.Component {
     }
 
     render() {
-        const isAdmin = (props.userRoles == "ROLE_admin");
-
+        const isAdmin = (props.userRoles.toUpperCase() == ("ROLE_admin").toUpperCase());
         return (
             <HashRouter>
                 <div>
@@ -40,5 +38,4 @@ class ExpenseSheet extends React.Component {
         )
     }
 }
-
 ReactDOM.render(<ExpenseSheet />, window.document.getElementById('container'));

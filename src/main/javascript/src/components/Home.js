@@ -1,5 +1,4 @@
 import React from "react";
-import { Header } from "./Header";
 import { SideBarNavigation_admin } from "./SideBarNavigation_admin";
 import { SideBarNavigation_employee } from "./SideBarNavigation_employee";
 
@@ -12,17 +11,14 @@ export class Home extends React.Component {
 
     render() {
         const currentLoggedinUserRoles = props.userRoles;
-
-        if (currentLoggedinUserRoles == "ROLE_admin") {
+        if (currentLoggedinUserRoles.toUpperCase() == ("ROLE_admin").toUpperCase()) {
             return (
                 <div>
-                    <Header />
                     <SideBarNavigation_admin />
                 </div>);
-        } else if (currentLoggedinUserRoles == "ROLE_employee") {
+        } else if (currentLoggedinUserRoles.toUpperCase() == ("ROLE_user").toUpperCase()) {
             return (
                 <div>
-                    <Header />
                     <SideBarNavigation_employee />
                 </div>);
         }
