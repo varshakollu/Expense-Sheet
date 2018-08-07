@@ -4,7 +4,8 @@ import Helmet from 'react-helmet';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import 'react-day-picker/lib/style.css';
 import { formatDate, parseDate } from "react-day-picker/moment";
-import 'whatwg-fetch'
+import 'whatwg-fetch';
+import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 
 export class Check_status extends React.Component {
 
@@ -119,6 +120,7 @@ export class Check_status extends React.Component {
   }
 
   render() {
+    const currentLoggedinUsername = props.userName;
     const { from, to } = this.state;
     const modifiers = { start: from, end: to };
     let sortedExpensesBySearch = this.state.statuses.filter(
@@ -136,13 +138,17 @@ export class Check_status extends React.Component {
       border: '1.5px solid black'
     };
 
+    var tableHeaderStyle = {
+      backgroundColor: 'lightblue'
+    };
+
     return (
       <div style={{ marginLeft: '17%' }}>
         <h3 style={{ marginBottom: '2%' }} >Expense Status</h3>
-        <div className="InputFromTo" style={{ marginBottom: '1%' }}>
+        <div className="InputFromTo" style={{ marginBottom: '2%' }}>
           <DayPickerInput
             value={from}
-            placeholder="From"
+            placeholder=" From"
             format="LL"
             formatDate={formatDate}
             parseDate={parseDate}
@@ -164,7 +170,7 @@ export class Check_status extends React.Component {
             <DayPickerInput
               ref={el => (this.to = el)}
               value={to}
-              placeholder="To"
+              placeholder=" To"
               format="LL"
               formatDate={formatDate}
               parseDate={parseDate}
@@ -208,15 +214,24 @@ export class Check_status extends React.Component {
 `}</style>
           </Helmet>
         </div>
-        <div class="active-cyan-4 mb-4">
-          <input id="searchField" style={{ width: '25%', marginBottom: '1%' }} class="form-control" type="text" placeholder="Search Reason/Status" onChange={this.searchInputChange} aria-label="Search" />
+        <div style={{ float: 'none', marginBottom: '2%' }}>
+          <input id="searchField" style={{ width: '25%', display: 'inline-block' }} className="form-control" type="text" placeholder="Search Reason/Status" onChange={this.searchInputChange} aria-label="Search" />
+          <button type="submit" style={{ marginLeft: '1%' }} className="btn btn-primary btn-sm" onClick={() => this.clearFilters()}>
+            Clear Filters
+            </button>
+          <div style={{ float: 'right', marginRight: '5%' }}>
+            <ReactHTMLTableToExcel
+              className="download-table-xls-button"
+              table="table-to-xls"
+              filename={"Expense Sheet - " + currentLoggedinUsername}
+              sheet="Expense Sheet"
+              buttonText="Download" 
+              style/>
+          </div>
         </div>
-        <button type="submit" style={{ marginBottom: '1%' }} class="btn btn-primary btn-sm" onClick={() => this.clearFilters()}>
-          Clear Filters
-        </button>
         <div>
-          <table style={{ border: '1.5px solid black', width: '95%' }} className="table table-bordered">
-            <thead>
+          <table id="table-to-xls" style={{ border: '1.5px solid black', width: '95%' }} className="table table-bordered">
+            <thead style={tableHeaderStyle}>
               <tr>
                 <th style={tableBorderStyle} scope="col" >Creation Date</th>
                 <th style={tableBorderStyle} scope="col" >Total Amount</th>

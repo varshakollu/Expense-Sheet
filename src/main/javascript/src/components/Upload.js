@@ -32,6 +32,7 @@ export class Upload extends React.Component {
         this.isExcel = this.isExcel.bind(this);
         this.updateListOfUploadedFiles = this.updateListOfUploadedFiles.bind(this);
         this.browseButtonClicked = this.browseButtonClicked.bind(this);
+        this.isNotExecutableFile = this.isNotExecutableFile.bind(this);
     }
     handleNameChange(event) {
         if (event.target.value != "") {
@@ -44,11 +45,16 @@ export class Upload extends React.Component {
     handleUploadFilesChange(event) {
         var uploadedFilesList = event.target.files;
         for (var i = 0; i < uploadedFilesList.length; i++) {
-            this.state.files.push(uploadedFilesList[i]);
+            //not executable and size<2MB
+            if (this.isNotExecutableFile(uploadedFilesList[i]) && this.validateSize(uploadedFilesList[i])) {
+                this.state.files.push(uploadedFilesList[i]);
+            }
         }
+        this.isNotExecutableFile(this.state.files);
         this.updateListOfUploadedFiles(this.state.files);
     }
     updateListOfUploadedFiles(updatedFiles) {
+        debugger;
         var output = document.getElementById('fileList');
 
         output.innerHTML = '<ul>';
@@ -63,6 +69,24 @@ export class Upload extends React.Component {
             return true;
         }
         else {
+            return false;
+        }
+    }
+    isNotExecutableFile(file) {
+        if (file.type != "application/x-msdownload") {
+            return true;
+        } else {
+            alert("Executable files are not allowed");
+            return false;
+        }
+    }
+
+    validateSize(file) {
+        var fileSize = file.size / 1024 / 1024;
+        if (fileSize < 2) {
+            return true;
+        } else {
+            alert(file.name + " exceeds 2 MB size, please upload a file that is less than 2 MB");
             return false;
         }
     }
@@ -91,7 +115,7 @@ export class Upload extends React.Component {
                     this.setState({
                         name: tempExpenseName,
                         disableUpload: false,
-                        files : tempArray
+                        files: tempArray
                     });
                 } else {
                     var tempExpenseName = this.state.name;
@@ -100,7 +124,7 @@ export class Upload extends React.Component {
                     this.setState({
                         name: tempExpenseName,
                         disableUpload: false,
-                        files : tempArray
+                        files: tempArray
                     });
                 }
             }
@@ -169,22 +193,22 @@ export class Upload extends React.Component {
             var confirmMessage = confirm("Please upload all appropriate bills.");
             if (confirmMessage) {
                 var tempExpenseName = this.state.name;
-                    var tempArray = this.state.files;
-                    this.setState(initialState);
-                    this.setState({
-                        name: tempExpenseName,
-                        disableUpload: false,
-                        files : tempArray
-                    });
+                var tempArray = this.state.files;
+                this.setState(initialState);
+                this.setState({
+                    name: tempExpenseName,
+                    disableUpload: false,
+                    files: tempArray
+                });
             } else {
                 var tempExpenseName = this.state.name;
-                    var tempArray = this.state.files;
-                    this.setState(initialState);
-                    this.setState({
-                        name: tempExpenseName,
-                        disableUpload: false,
-                        files : tempArray
-                    });
+                var tempArray = this.state.files;
+                this.setState(initialState);
+                this.setState({
+                    name: tempExpenseName,
+                    disableUpload: false,
+                    files: tempArray
+                });
             }
         }
         else if (this.state.countOfExcelFiles == 1 && this.state.countOfBills >= 1) {
@@ -234,16 +258,18 @@ export class Upload extends React.Component {
                     <a href="https://www.yash.com/onboard/Expense sheet template.xlsx">Click here to download Sample Expense Sheet</a>
                 </div>
                 <form id="myForm">
-                    <div class="form-group col-lg-6">
+                    <div className="form-group col-lg-6">
                         <label>Enter the name for your expense</label>
-                        <input id="NameControl" className="form-control"
+                        <input id="NameControl"
+                            className="form-control"
                             type="text"
+                            maxLength="20"
                             onChange={this.handleNameChange}
                             required />
                     </div>
 
                     <div className="form-row">
-                        <div class="form-group col-lg-8">
+                        <div className="form-group col-lg-8">
                             <label>Upload the Expense sheet along with the bills</label>
                             <input type="file"
                                 {...hiddenFileControlStyle}
@@ -264,12 +290,12 @@ export class Upload extends React.Component {
                         </div>
                     </div>
                     <div className="form-row">
-                        <div class="form-group col-lg-8">
+                        <div className="form-group col-lg-8">
                             <div id="fileList"></div>
                         </div>
                     </div>
                     <div className="form-row">
-                        <div class="form-group col-lg-8">
+                        <div className="form-group col-lg-8">
                             <button className="btn btn-primary" type="button" onClick={this.handleSubmit}>Submit my Expense report</button>
                             <button className="btn btn-link" type="reset" onClick={this.handleCancel}> Cancel </button>
                         </div>
