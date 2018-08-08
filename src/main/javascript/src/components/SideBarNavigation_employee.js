@@ -34,27 +34,27 @@ export class SideBarNavigation_employee extends React.Component {
                 backgroundColor: '#01498B'
             }}>
 
-                <ul class="nav flex-column">
-                    <li class="nav-item">
+                <ul className="nav flex-column">
+                    <li className="nav-item">
                         <Link {...navLinkStyle} {...onMouseOverNavLinkStyle} to={"/"}>
                             <span className="glyphicon glyphicon-home" {...iconStyles}></span>
                             <span>Home</span>
                         </Link>
                     </li>
-                    <li class="nav-item">
-                        <Link class="nav-link active" {...navLinkStyle} {...onMouseOverNavLinkStyle} to={"/upload"}>
+                    <li className="nav-item">
+                        <Link className="nav-link active" {...navLinkStyle} {...onMouseOverNavLinkStyle} to={"/upload"}>
                             <span className="glyphicon glyphicon-upload" {...iconStyles}></span>
                             <span>Upload Bills</span>
                         </Link>
                     </li>
-                    <li class="nav-item">
-                        <Link class="nav-link active" {...navLinkStyle} {...onMouseOverNavLinkStyle} to={"/status"}>
+                    <li className="nav-item">
+                        <Link className="nav-link active" {...navLinkStyle} {...onMouseOverNavLinkStyle} to={"/status"}>
                             <span className="glyphicon glyphicon-list-alt" {...iconStyles}></span>
                             <span>Check status</span>
                         </Link>
                     </li>
-                    <li class="nav-item">
-                        <Link class="nav-link active" {...navLinkStyle} {...onMouseOverNavLinkStyle} to={"/help"}>
+                    <li className="nav-item">
+                        <Link className="nav-link active" {...navLinkStyle} {...onMouseOverNavLinkStyle} to={"/help"}>
                             <span className="glyphicon glyphicon-question-sign" {...iconStyles}></span>
                             <span>Help</span>
                         </Link>

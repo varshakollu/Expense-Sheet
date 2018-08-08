@@ -1,12 +1,10 @@
 package com.yash.ExpenseClaims.controllers;
 
 import com.yash.ExpenseClaims.dto.RoleDto;
-import com.yash.ExpenseClaims.dto.UserDto;
 import com.yash.ExpenseClaims.services.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 

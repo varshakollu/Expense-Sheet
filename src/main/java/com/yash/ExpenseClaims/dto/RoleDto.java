@@ -1,7 +1,7 @@
 package com.yash.ExpenseClaims.dto;
 
-
 public class RoleDto {
+
     private int role_id;
     private String role_name;
 

@@ -2,15 +2,18 @@ package com.yash.ExpenseClaims.dto;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.Date;
 
 @Configuration
 public class ExpenseDto {
 
     private int expenseID;
+
+    @NotNull
+    private Date creationDate;
 
     @NotNull
     @Size(min=2, max=30)
@@ -74,5 +77,13 @@ public class ExpenseDto {
 
     public void setApprovalStatus(String approvalStatus) {
         this.approvalStatus = approvalStatus;
+    }
+
+    public Date getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(Date creationDate) {
+        this.creationDate = creationDate;
     }
 }
