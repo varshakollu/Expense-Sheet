@@ -47,8 +47,8 @@ export class Check_status extends React.Component {
     var from = this.state.from = undefined;
     var to = this.state.to = undefined;
     this.filterDateRange(from, to);
-
   }
+
   focusTo() {
     this.timeout = setTimeout(() => this.to.getInput().focus(), 0);
   }
@@ -73,19 +73,14 @@ export class Check_status extends React.Component {
     if (from == undefined) {
       from = new Date("05/20/2018");
     }
-    else {
-      to = to;
-    }
 
     if (to == undefined) {
       to = new Date();
     }
-    else {
-      to = to;
-    }
+
     const currentLoggedinUsername = props.userName;
     let query = "username=" + currentLoggedinUsername + "&startDate=" + from + "&endDate=" + to;
-    let url = "checkStatusWithDateRange?" + query
+    let url = "expenses?" + query
 
     fetch(url)
       .then(res => res.json())
@@ -107,16 +102,7 @@ export class Check_status extends React.Component {
   };
 
   componentWillMount() {
-    const currentLoggedinUsername = props.userName;
-    fetch("/checkstatus/" + currentLoggedinUsername, {
-      credentials: "same-origin"
-    })
-      .then(res => res.json())
-      .then(res => {
-        this.setState({
-          statuses: res
-        });
-      });
+    this.filterDateRange(undefined, undefined);
   }
 
   render() {
@@ -225,8 +211,8 @@ export class Check_status extends React.Component {
               table="table-to-xls"
               filename={"Expense Sheet - " + currentLoggedinUsername}
               sheet="Expense Sheet"
-              buttonText="Download" 
-              style/>
+              buttonText="Download"
+              style />
           </div>
         </div>
         <div>

@@ -1,4 +1,4 @@
-package com.yash.ExpenseClaims.controllers;
+package com.yash.ExpenseClaims.restcontrollers;
 
 import com.yash.ExpenseClaims.dto.UserDto;
 import com.yash.ExpenseClaims.services.UserService;
@@ -11,7 +11,7 @@ import java.util.List;
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @RestController
-public class UserController {
+public class UserRestController {
 
     @Autowired
     private UserService userService;
@@ -23,12 +23,12 @@ public class UserController {
     }
 
     @RequestMapping(value = "/users/{username}", method = PUT)
-    public UserDto updateUser(@PathVariable(name = "username", value = "username") String username, @RequestBody UserDto userDto) {
+    public UserDto updateUser(@PathVariable("username") String username, @RequestBody UserDto userDto) {
         return userService.updateUser(username, userDto);
     }
 
     @RequestMapping(value = "/users/{username}", method = DELETE)
-    public void deleteUser(@PathVariable(name = "username", value = "username") String username, HttpServletResponse response) {
+    public void deleteUser(@PathVariable("username") String username, HttpServletResponse response) {
         userService.deleteUser(username);
         response.setStatus(HttpStatus.OK.value());
     }
@@ -39,7 +39,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/users/{username}", method = GET)
-    public UserDto getUserByUserName(@PathVariable(name = "username", value = "username") String username) {
+    public UserDto getUserByUserName(@PathVariable("username") String username) {
         return userService.getUserByUserName(username);
     }
 }

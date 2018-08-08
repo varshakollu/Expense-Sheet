@@ -1,4 +1,4 @@
-package com.yash.ExpenseClaims.controllers;
+package com.yash.ExpenseClaims.restcontrollers;
 
 import com.yash.ExpenseClaims.dto.ExpenseDto;
 import com.yash.ExpenseClaims.repositories.UploadFilesToDB;
@@ -14,12 +14,12 @@ import java.util.List;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @RestController
-public class FileUploadController {
+public class FileUploadRestController {
 
     @Autowired
     private UploadFilesToDB uploadFilesToDB;
 
-    @PostMapping("/upload")
+    @PostMapping("/expenses")
     public ModelAndView handleFileUpload(
             @RequestParam("username") String username,
             @RequestParam("amount") Double amount,
@@ -33,17 +33,10 @@ public class FileUploadController {
         return mv;
     }
 
-    @RequestMapping(value = "/checkstatus/{username}", method = GET)
-    public List<ExpenseDto> checkStatus(@PathVariable(name = "username", value = "username") String username) throws IOException {
-        List<ExpenseDto> list = uploadFilesToDB.retrieveAllExpenses(username);
-        return list;
-    }
-
-    @RequestMapping(value = "/checkStatusWithDateRange", method = RequestMethod.GET)
+    @RequestMapping(value = "/expenses", method = GET)
     public List<ExpenseDto> checkStatusWithDateRange(@RequestParam("username") String username,
                                                      @RequestParam("startDate") Date startDate,
-                                                     @RequestParam("endDate") Date endDate) throws IOException, ParseException {
-        List<ExpenseDto> list = uploadFilesToDB.retrieveAllExpensesWithDateRange(username, startDate, endDate);
-        return list;
+                                                     @RequestParam("endDate") Date endDate) {
+        return uploadFilesToDB.retrieveAllExpensesWithDateRange(username, startDate, endDate);
     }
 }
