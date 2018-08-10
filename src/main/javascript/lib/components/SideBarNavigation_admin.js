@@ -66,10 +66,10 @@ var SideBarNavigation_admin = exports.SideBarNavigation_admin = function (_React
                     } },
                 _react2.default.createElement(
                     "ul",
-                    { "class": "nav flex-column" },
+                    { className: "nav flex-column" },
                     _react2.default.createElement(
                         "li",
-                        { "class": "nav-item" },
+                        { className: "nav-item" },
                         _react2.default.createElement(
                             _reactRouterDom.Link,
                             _extends({}, navLinkStyle, onMouseOverNavLinkStyle, { to: "/" }),
@@ -83,10 +83,10 @@ var SideBarNavigation_admin = exports.SideBarNavigation_admin = function (_React
                     ),
                     _react2.default.createElement(
                         "li",
-                        { "class": "nav-item" },
+                        { className: "nav-item" },
                         _react2.default.createElement(
                             _reactRouterDom.Link,
-                            _extends({ "class": "nav-link active" }, navLinkStyle, onMouseOverNavLinkStyle, { to: "/upload" }),
+                            _extends({ className: "nav-link active" }, navLinkStyle, onMouseOverNavLinkStyle, { to: "/upload" }),
                             _react2.default.createElement("span", _extends({ className: "glyphicon glyphicon-upload" }, iconStyles)),
                             _react2.default.createElement(
                                 "span",
@@ -97,10 +97,10 @@ var SideBarNavigation_admin = exports.SideBarNavigation_admin = function (_React
                     ),
                     _react2.default.createElement(
                         "li",
-                        { "class": "nav-item" },
+                        { className: "nav-item" },
                         _react2.default.createElement(
                             _reactRouterDom.Link,
-                            _extends({ "class": "nav-link active" }, navLinkStyle, onMouseOverNavLinkStyle, { to: "/status" }),
+                            _extends({ className: "nav-link active" }, navLinkStyle, onMouseOverNavLinkStyle, { to: "/status" }),
                             _react2.default.createElement("span", _extends({ className: "glyphicon glyphicon-list-alt" }, iconStyles)),
                             _react2.default.createElement(
                                 "span",
@@ -111,10 +111,10 @@ var SideBarNavigation_admin = exports.SideBarNavigation_admin = function (_React
                     ),
                     _react2.default.createElement(
                         "li",
-                        { "class": "nav-item" },
+                        { className: "nav-item" },
                         _react2.default.createElement(
                             _reactRouterDom.Link,
-                            _extends({ "class": "nav-link active" }, navLinkStyle, onMouseOverNavLinkStyle, { to: "/approve" }),
+                            _extends({ className: "nav-link active" }, navLinkStyle, onMouseOverNavLinkStyle, { to: "/approve" }),
                             _react2.default.createElement("span", _extends({ className: "glyphicon glyphicon-check" }, iconStyles)),
                             _react2.default.createElement(
                                 "span",
@@ -125,10 +125,10 @@ var SideBarNavigation_admin = exports.SideBarNavigation_admin = function (_React
                     ),
                     _react2.default.createElement(
                         "li",
-                        { "class": "nav-item" },
+                        { className: "nav-item" },
                         _react2.default.createElement(
                             _reactRouterDom.Link,
-                            _extends({ "class": "nav-link active" }, navLinkStyle, onMouseOverNavLinkStyle, { to: "/help" }),
+                            _extends({ className: "nav-link active" }, navLinkStyle, onMouseOverNavLinkStyle, { to: "/help" }),
                             _react2.default.createElement("span", _extends({ className: "glyphicon glyphicon-question-sign" }, iconStyles)),
                             _react2.default.createElement(
                                 "span",

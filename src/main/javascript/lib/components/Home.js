@@ -11,8 +11,6 @@ var _react = require("react");
 
 var _react2 = _interopRequireDefault(_react);
 
-var _Header = require("./Header");
-
 var _SideBarNavigation_admin = require("./SideBarNavigation_admin");
 
 var _SideBarNavigation_employee = require("./SideBarNavigation_employee");
@@ -41,19 +39,16 @@ var Home = exports.Home = function (_React$Component) {
         key: "render",
         value: function render() {
             var currentLoggedinUserRoles = props.userRoles;
-
-            if (currentLoggedinUserRoles == "ROLE_admin") {
+            if (currentLoggedinUserRoles.toUpperCase() == "ROLE_admin".toUpperCase()) {
                 return _react2.default.createElement(
                     "div",
                     null,
-                    _react2.default.createElement(_Header.Header, null),
                     _react2.default.createElement(_SideBarNavigation_admin.SideBarNavigation_admin, null)
                 );
-            } else if (currentLoggedinUserRoles == "ROLE_employee") {
+            } else if (currentLoggedinUserRoles.toUpperCase() == "ROLE_user".toUpperCase()) {
                 return _react2.default.createElement(
                     "div",
                     null,
-                    _react2.default.createElement(_Header.Header, null),
                     _react2.default.createElement(_SideBarNavigation_employee.SideBarNavigation_employee, null)
                 );
             }

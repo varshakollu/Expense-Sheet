@@ -19,20 +19,6 @@ public class FileUploadController {
     @Autowired
     private UploadFilesToDB uploadFilesToDB;
 
-    @PostMapping("/upload")
-    public ModelAndView handleFileUpload(
-            @RequestParam("username") String username,
-            @RequestParam("amount") Double amount,
-            @RequestParam("reason") String reason,
-            @RequestParam("file") MultipartFile file) {
-
-        uploadFilesToDB.upload(username, amount, reason, file);
-        HashMap<String, String> variables = new HashMap<>();
-        variables.put("username", username);
-        ModelAndView mv = new ModelAndView("redirect:/success", variables);
-        return mv;
-    }
-
     @RequestMapping(value = "/checkstatus/{username}", method = GET)
     public List<ExpenseDto> checkStatus(@PathVariable(name = "username", value = "username") String username) throws IOException {
         List<ExpenseDto> list = uploadFilesToDB.retrieveAllExpenses(username);

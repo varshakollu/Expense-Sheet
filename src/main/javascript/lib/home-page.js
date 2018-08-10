@@ -48,8 +48,7 @@ var ExpenseSheet = function (_React$Component) {
     _createClass(ExpenseSheet, [{
         key: "render",
         value: function render() {
-            var isAdmin = props.userRoles == "ROLE_admin";
-
+            var isAdmin = props.userRoles.toUpperCase() == "ROLE_admin".toUpperCase();
             return _react2.default.createElement(
                 _reactRouterDom.HashRouter,
                 null,
@@ -57,7 +56,6 @@ var ExpenseSheet = function (_React$Component) {
                     "div",
                     null,
                     _react2.default.createElement(_reactRouterDom.Route, { path: "/", component: _Home.Home }),
-                    _react2.default.createElement(_reactRouterDom.Route, { path: "/home", component: _Home.Home }),
                     _react2.default.createElement(_reactRouterDom.Route, { path: "/upload", component: _Upload.Upload }),
                     _react2.default.createElement(_reactRouterDom.Route, { path: "/status", component: _Check_status.Check_status }),
                     _react2.default.createElement(_reactRouterDom.Route, { path: "/approve", render: function render() {
