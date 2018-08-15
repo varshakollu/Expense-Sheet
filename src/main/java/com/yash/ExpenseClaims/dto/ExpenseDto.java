@@ -1,35 +1,41 @@
 package com.yash.ExpenseClaims.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.multipart.MultipartFile;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.util.Date;
 
 @Configuration
-public class ExpenseDto {
+public class ExpenseDto implements Serializable {
 
+    @JsonProperty("expenseID")
     private int expenseID;
 
-    @NotNull
+    @JsonProperty("creationDate")
     private Date creationDate;
 
     @NotNull
     @Size(min=2, max=30)
+    @JsonProperty("username")
     private String username;
 
-    @NotNull
+    @JsonProperty("amount")
     private Double amount;
 
-    @NotNull
-    private String reason;
+    @JsonProperty("expenseName")
+    private String expenseName;
 
-    @NotNull
-    @NotEmpty
-    private MultipartFile file;
+    @JsonProperty("status")
+    private String status;
 
-    private String approvalStatus;
+    @JsonProperty("managerName")
+    private String managerName;
 
     public int getExpenseID() {
         return expenseID;
@@ -55,28 +61,20 @@ public class ExpenseDto {
         this.amount = amount;
     }
 
-    public String getReason() {
-        return reason;
+    public String getExpenseName() {
+        return expenseName;
     }
 
-    public void setReason(String reason) {
-        this.reason = reason;
+    public void setExpenseName(String expenseName) {
+        this.expenseName = expenseName;
     }
 
-    public MultipartFile getFile() {
-        return file;
+    public String getStatus() {
+        return status;
     }
 
-    public void setFile(MultipartFile file) {
-        this.file = file;
-    }
-
-    public String getApprovalStatus() {
-        return approvalStatus;
-    }
-
-    public void setApprovalStatus(String approvalStatus) {
-        this.approvalStatus = approvalStatus;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public Date getCreationDate() {
@@ -85,5 +83,13 @@ public class ExpenseDto {
 
     public void setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
+    }
+
+    public String getManagerName() {
+        return managerName;
+    }
+
+    public void setManagerName(String managerName) {
+        this.managerName = managerName;
     }
 }

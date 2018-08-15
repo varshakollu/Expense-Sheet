@@ -12,7 +12,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
-public class FileUploadRestController {
+public class ExpensesRestController {
 
     @Autowired
     private ExpensesRepository expensesRepository;
@@ -20,12 +20,11 @@ public class FileUploadRestController {
     @RequestMapping(value="/expenses", method = POST)
     public void saveAllExpensesToDB(@RequestParam("username") String username,
                            @RequestParam("creationDate") Date creationDate,
-                           @RequestParam("reason") String reason,
+                           @RequestParam("expenseName") String expenseName,
                            @RequestParam("amount") Double amount,
                            @RequestParam("status") String status,
-                           @RequestPart("bills") MultipartFile multipartFile){
-        System.out.println("test");
-        expensesRepository.saveAllExpenses(username, creationDate, reason, amount, status, multipartFile);
+                           @RequestPart("bills") MultipartFile[] multipartFile){
+        expensesRepository.saveAllExpenses(username, creationDate, expenseName, amount, status, multipartFile);
     }
 
     @RequestMapping(value = "/expenses", method = GET)

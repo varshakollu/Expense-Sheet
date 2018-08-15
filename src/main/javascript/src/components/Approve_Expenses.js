@@ -92,6 +92,7 @@ export class Approve_Expenses extends React.Component {
   }
 
   componentWillMount() {
+    debugger;
     this.filterDateRange(undefined, undefined);
   }
 
@@ -102,7 +103,7 @@ export class Approve_Expenses extends React.Component {
     let sortedExpensesBySearch = this.state.statuses.filter(
       (p) => {
         if (this.state.searchValue) {
-          return p.reason.toLowerCase().indexOf(this.state.searchValue) !== -1 || p.status.toLowerCase().indexOf(this.state.searchValue) !== -1;
+          return p.expenseName.toLowerCase().indexOf(this.state.searchValue) !== -1 || p.status.toLowerCase().indexOf(this.state.searchValue) !== -1;
         }
         else {
           return p;
@@ -132,7 +133,7 @@ export class Approve_Expenses extends React.Component {
               <th style={tableBorderStyle} scope="col" >Employee Name</th>
               <th style={tableBorderStyle} scope="col" >Submission Date</th>
               <th style={tableBorderStyle} scope="col" >Total Amount</th>
-              <th style={tableBorderStyle} scope="col">Reason for Expense</th>
+              <th style={tableBorderStyle} scope="col">Expense Name</th>
               <th style={tableBorderStyle} scope="col">Status</th>
             </tr>
           </thead>
@@ -143,7 +144,7 @@ export class Approve_Expenses extends React.Component {
                 <td style={tableBorderStyle}>{p.username}</td>
                 <td style={tableBorderStyle}>{p.creationDate}</td>
                 <td style={tableBorderStyle}>${p.amount}</td>
-                <td style={tableBorderStyle}>{p.reason}</td>
+                <td style={tableBorderStyle}>{p.expenseName}</td>
                 <td style={tableBorderStyle}>{p.status}</td>
               </tr>
             ))}

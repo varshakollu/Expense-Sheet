@@ -131,7 +131,7 @@ export class Check_status extends React.Component {
               <th style={tableBorderStyle} scope="col" >Expense ID</th>
               <th style={tableBorderStyle} scope="col" >Submission Date</th>
               <th style={tableBorderStyle} scope="col" >Total Amount</th>
-              <th style={tableBorderStyle} scope="col">Reason for Expense</th>
+              <th style={tableBorderStyle} scope="col">Expense Name</th>
               <th style={tableBorderStyle} scope="col">Status</th>
             </tr>
           </thead>
