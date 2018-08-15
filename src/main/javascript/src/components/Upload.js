@@ -26,17 +26,30 @@ export class Upload extends React.Component {
         };
 
         this.handleNameChange = this.handleNameChange.bind(this);
+        this.handleAmountChange = this.handleAmountChange.bind(this);
         this.handleUploadFilesChange = this.handleUploadFilesChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
         this.isExcel = this.isExcel.bind(this);
-        this.updateListOfUploadedFiles = this.updateListOfUploadedFiles.bind(this);
         this.browseButtonClicked = this.browseButtonClicked.bind(this);
         this.isNotExecutableFile = this.isNotExecutableFile.bind(this);
+        this.addRemoveButtonEvents = this.addRemoveButtonEvents.bind(this);
+        this.removeExcelFilesAndSaveBills = this.removeExcelFilesAndSaveBills.bind(this);
+        this.saveExcelFileAndRequestForBills = this.saveExcelFileAndRequestForBills.bind(this);
+        this.saveAllBillsAndRequestForExcelFile = this.saveAllBillsAndRequestForExcelFile.bind(this);
     }
     handleNameChange(event) {
         if (event.target.value != "") {
             this.setState({ name: event.target.value, disableUpload: false });
+        }
+        else {
+            this.setState({ disableUpload: true });
+        }
+    }
+
+    handleAmountChange(event) {
+        if (event.target.value != "") {
+            this.setState({ amount: event.target.value });
         }
     }
     browseButtonClicked(event) {
@@ -50,27 +63,7 @@ export class Upload extends React.Component {
                 this.state.files.push(uploadedFilesList[i]);
             }
         }
-        this.isNotExecutableFile(this.state.files);
-        this.updateListOfUploadedFiles(this.state.files);
-    }
-    updateListOfUploadedFiles(updatedFiles) {
-        debugger;
-        var output = document.getElementById('fileList');
-
-        output.innerHTML = '<ul>';
-        for (var i = 0; i < updatedFiles.length; ++i) {
-            output.innerHTML += '<li>' + updatedFiles[i].name + '</li>';
-        }
-        output.innerHTML += '</ul>';
-    }
-    isExcel(file) {
-        if (file.type == "application/vnd.ms-excel" ||
-            file.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
-            return true;
-        }
-        else {
-            return false;
-        }
+        this.updateTableHTML(this.state.files);
     }
     isNotExecutableFile(file) {
         if (file.type != "application/x-msdownload") {
@@ -90,10 +83,55 @@ export class Upload extends React.Component {
             return false;
         }
     }
+    updateTableHTML(updatedFiles) {
+        var table = document.getElementById("uploadTable");
+        table.innerHTML = "";
+        for (var i = 0; i < updatedFiles.length; ++i) {
+            var currentFile = updatedFiles[i];
+
+            var row = table.insertRow(i);
+            var cell1 = row.insertCell(0);
+            var cell2 = row.insertCell(1);
+
+            var buttonHTML = document.createElement("BUTTON");
+            var button_ID = currentFile.name + "_" + i;;
+            buttonHTML.setAttribute("id", button_ID);
+            buttonHTML.setAttribute("class", "btn btn-link");
+            buttonHTML.setAttribute("type", "button");
+            buttonHTML.appendChild(document.createTextNode("remove"));
+            cell1.innerText = currentFile.name
+            cell2.appendChild(buttonHTML)
+        }
+        this.addRemoveButtonEvents(this.state.files);
+    }
+    addRemoveButtonEvents(updatedFiles) {
+        var that = this;
+        for (var id = 0; id < updatedFiles.length; id++) {
+            var button_ID = updatedFiles[id].name + "_" + id;
+            var button = document.getElementById(button_ID);
+            button.addEventListener("click", function (event) {
+                var button_ID = event.currentTarget.id;
+                var n = button_ID.lastIndexOf("_");
+                var index = button_ID.substring(n + 1);
+
+                that.state.files.splice(index, 1);
+                that.updateTableHTML(that.state.files);
+            });
+        }
+    }
+    isExcel(file) {
+        if (file.type == "application/vnd.ms-excel" ||
+            file.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
     handleSubmit(event) {
 
         var files = this.state.files;
-
         for (var i = 0; i < files.length; i++) {
             if (this.isExcel(files[i])) {
                 this.state.countOfExcelFiles++;
@@ -109,80 +147,18 @@ export class Upload extends React.Component {
                 //save the bills in the state, request for expense sheet
                 var confirmMessage = confirm("Please upload an Expense sheet in .xls or .xlsx or .csv format.");
                 if (confirmMessage) {
-                    var tempExpenseName = this.state.name;
-                    var tempArray = this.state.files;
-                    this.setState(initialState);
-                    this.setState({
-                        name: tempExpenseName,
-                        disableUpload: false,
-                        files: tempArray
-                    });
+                    this.saveAllBillsAndRequestForExcelFile(confirmMessage);
                 } else {
-                    var tempExpenseName = this.state.name;
-                    var tempArray = this.state.files;
-                    this.setState(initialState);
-                    this.setState({
-                        name: tempExpenseName,
-                        disableUpload: false,
-                        files: tempArray
-                    });
+                    this.saveAllBillsAndRequestForExcelFile(confirmMessage);
                 }
             }
             // If multiple excel files are found, remove excel files and save bills in the state.
             else if (this.state.countOfExcelFiles > 1) {
                 var confirmMessage = confirm("Please upload only one Expense sheet in .xls or .xlsx format.");
                 if (confirmMessage) {
-                    var tempExpenseName = this.state.name;
-                    this.setState(initialState);
-                    this.setState({
-                        name: tempExpenseName,
-                        disableUpload: false
-                    });
-                    //Remove all excel files and save bills temporarily.
-                    var tempArray = this.state.files;
-                    var that = this;
-                    var excelFoundInTheArray = true;
-
-                    while (excelFoundInTheArray) {
-                        var currentIndex = 0;
-                        excelFoundInTheArray = tempArray.some(function (item, index, object) {
-                            currentIndex = index;
-                            return that.isExcel(item);
-                        });
-                        if (excelFoundInTheArray) {
-                            tempArray.splice(currentIndex, 1);
-                        } else {
-                            break;
-                        }
-                    }
-                    this.updateListOfUploadedFiles(tempArray);
-                    this.setState({ files: tempArray });
+                    this.removeExcelFilesAndSaveBills(confirmMessage);
                 } else {
-                    var tempExpenseName = this.state.name;
-                    this.setState(initialState);
-                    this.setState({
-                        name: tempExpenseName,
-                        disableUpload: false
-                    });
-                    //Remove all excel files and save bills temporarily.
-                    var tempArray = this.state.files;
-                    var that = this;
-                    var excelFoundInTheArray = true;
-                    while (excelFoundInTheArray) {
-                        var currentIndex = 0;
-                        excelFoundInTheArray = tempArray.some(function (item, index, object) {
-                            currentIndex = index;
-                            return that.isExcel(item);
-                        });
-                        if (excelFoundInTheArray) {
-                            tempArray.splice(currentIndex, 1);
-                        } else {
-                            break;
-                        }
-                    }
-                    this.updateListOfUploadedFiles(tempArray);
-                    this.setState({ files: tempArray });
-
+                    this.removeExcelFilesAndSaveBills(confirmMessage);
                 }
             }
         }
@@ -192,34 +168,86 @@ export class Upload extends React.Component {
             // save the excel sheet in the state, request for bills
             var confirmMessage = confirm("Please upload all appropriate bills.");
             if (confirmMessage) {
-                var tempExpenseName = this.state.name;
-                var tempArray = this.state.files;
-                this.setState(initialState);
-                this.setState({
-                    name: tempExpenseName,
-                    disableUpload: false,
-                    files: tempArray
-                });
+                this.saveExcelFileAndRequestForBills(confirmMessage);
             } else {
-                var tempExpenseName = this.state.name;
-                var tempArray = this.state.files;
-                this.setState(initialState);
-                this.setState({
-                    name: tempExpenseName,
-                    disableUpload: false,
-                    files: tempArray
-                });
+                this.saveExcelFileAndRequestForBills(confirmMessage);
             }
         }
         else if (this.state.countOfExcelFiles == 1 && this.state.countOfBills >= 1) {
-            alert("Success! The entered Data is valid, will be posted to Server later.");
-            this.setState(initialState);
-            while (this.state.files.length > 0) {
-                this.state.files.pop();
+
+
+            var formData = new FormData();
+            formData.append("username", props.userName);
+            formData.append("creationDate", new Date());
+            formData.append("expenseName", this.state.name);
+            formData.append("amount", this.state.amount);
+            formData.append("status", "Submitted");
+
+            for (var i = 0; i < files.length; i++) {
+                formData.append("bills", files[i]);
             }
-            document.getElementById("myForm").reset();
-            document.getElementById("fileList").innerHTML = "";
+
+            debugger;
+            $.ajax({
+                url: "/expenses",
+                type: "POST",
+                encType: "multipart/form-data",
+                contentType: false,
+                processData: false,
+                data: formData,
+                success: this.handleSubmitSuccess,
+                error: this.handleSubmitFailure
+
+            });
         }
+    }
+
+    saveAllBillsAndRequestForExcelFile(confirmMessage) {
+        var tempExpenseName = this.state.name;
+        var tempArray = this.state.files;
+        this.setState(initialState);
+        this.setState({
+            name: tempExpenseName,
+            disableUpload: false,
+            files: tempArray
+        });
+    }
+    removeExcelFilesAndSaveBills(confirmMessage) {
+        var tempExpenseName = this.state.name;
+        this.setState(initialState);
+        this.setState({
+            name: tempExpenseName,
+            disableUpload: false
+        });
+        //Remove all excel files and save bills temporarily.
+        var tempArray = this.state.files;
+        var that = this;
+        var excelFoundInTheArray = true;
+
+        while (excelFoundInTheArray) {
+            var currentIndex = 0;
+            excelFoundInTheArray = tempArray.some(function (item, index, object) {
+                currentIndex = index;
+                return that.isExcel(item);
+            });
+            if (excelFoundInTheArray) {
+                tempArray.splice(currentIndex, 1);
+            } else {
+                break;
+            }
+        }
+        this.updateTableHTML(tempArray);
+        this.setState({ files: tempArray });
+    }
+    saveExcelFileAndRequestForBills(confirmMessage) {
+        var tempExpenseName = this.state.name;
+        var tempArray = this.state.files;
+        this.setState(initialState);
+        this.setState({
+            name: tempExpenseName,
+            disableUpload: false,
+            files: tempArray
+        });
     }
 
     handleCancel(event) {
@@ -228,11 +256,11 @@ export class Upload extends React.Component {
             this.state.files.pop();
         }
         document.getElementById("myForm").reset();
-        document.getElementById("fileList").innerHTML = "";
+        document.getElementById("uploadTable").innerHTML = "";
     }
 
-    handleSubmitSuccess(data) {
-        console.log(data);
+    handleSubmitSuccess() {
+        window.location.reload(true);
     }
 
     handleSubmitFailure(error) {
@@ -240,6 +268,7 @@ export class Upload extends React.Component {
     }
 
     render() {
+
         const hiddenFileControlStyle = css({
             visible: "none"
         });
@@ -267,6 +296,14 @@ export class Upload extends React.Component {
                             onChange={this.handleNameChange}
                             required />
                     </div>
+                    <div className="form-group col-lg-6">
+                        <label>Total amount spent</label>
+                        <input id="AmountControl"
+                            className="form-control"
+                            type="number"
+                            onChange={this.handleAmountChange}
+                            required />
+                    </div>
 
                     <div className="form-row">
                         <div className="form-group col-lg-8">
@@ -291,7 +328,12 @@ export class Upload extends React.Component {
                     </div>
                     <div className="form-row">
                         <div className="form-group col-lg-8">
-                            <div id="fileList"></div>
+
+                            <div>
+                                <table id="uploadTable" border='0' style={{ width: '60%' }}>
+
+                                </table>
+                            </div>
                         </div>
                     </div>
                     <div className="form-row">

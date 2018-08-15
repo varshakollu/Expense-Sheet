@@ -5,7 +5,7 @@ import DayPickerInput from 'react-day-picker/DayPickerInput';
 import 'react-day-picker/lib/style.css';
 import { formatDate, parseDate } from "react-day-picker/moment";
 import 'whatwg-fetch';
-import ReactHTMLTableToExcel from 'react-html-table-to-excel';
+import ReactHTMLTable_ToExcel from "./ReactHTMLTable_ToExcel";
 
 export class Check_status extends React.Component {
 
@@ -91,16 +91,6 @@ export class Check_status extends React.Component {
       });
   }
 
-  handleSubmitSuccess(data) {
-    this.setState({
-      statuses: data
-    });
-  }
-
-  handleSubmitFailure(error) {
-    console.log(error);
-  };
-
   componentWillMount() {
     this.filterDateRange(undefined, undefined);
   }
@@ -112,7 +102,7 @@ export class Check_status extends React.Component {
     let sortedExpensesBySearch = this.state.statuses.filter(
       (p) => {
         if (this.state.searchValue) {
-          return p.reason.toLowerCase().indexOf(this.state.searchValue) !== -1 || p.approvalStatus.toLowerCase().indexOf(this.state.searchValue) !== -1;
+          return p.expenseName.toLowerCase().indexOf(this.state.searchValue) !== -1 || p.status.toLowerCase().indexOf(this.state.searchValue) !== -1;
         }
         else {
           return p;
@@ -127,6 +117,38 @@ export class Check_status extends React.Component {
     var tableHeaderStyle = {
       backgroundColor: 'lightblue'
     };
+
+    var tableData;
+
+    if (sortedExpensesBySearch.length == 0) {
+      tableData = <div><h3> No Records Found </h3></div>
+    }
+    else {
+      tableData = <div>
+        <table id="table-to-xls" style={{ border: '1.5px solid black', width: '95%' }} className="table table-bordered">
+          <thead style={tableHeaderStyle}>
+            <tr>
+              <th style={tableBorderStyle} scope="col" >Expense ID</th>
+              <th style={tableBorderStyle} scope="col" >Submission Date</th>
+              <th style={tableBorderStyle} scope="col" >Total Amount</th>
+              <th style={tableBorderStyle} scope="col">Reason for Expense</th>
+              <th style={tableBorderStyle} scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sortedExpensesBySearch.map((p) => (
+              <tr scope="row">
+                <td style={tableBorderStyle}>{p.expenseID}</td>
+                <td style={tableBorderStyle}>{p.creationDate}</td>
+                <td style={tableBorderStyle}>${p.amount}</td>
+                <td style={tableBorderStyle}>{p.expenseName}</td>
+                <td style={tableBorderStyle}>{p.status}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    }
 
     return (
       <div style={{ marginLeft: '17%' }}>
@@ -144,6 +166,7 @@ export class Check_status extends React.Component {
                 after: new Date(),
                 before: new Date("05/20/2018")
               },
+              fromMonth: from,
               toMonth: to,
               modifiers,
               numberOfMonths: 2,
@@ -164,7 +187,7 @@ export class Check_status extends React.Component {
                 selectedDays: [from, { from, to }],
                 disabledDays: {
                   after: new Date(),
-                  before: from
+                  before: new Date("05/20/2018")
                 },
                 modifiers,
                 month: from,
@@ -206,7 +229,7 @@ export class Check_status extends React.Component {
             Clear Filters
             </button>
           <div style={{ float: 'right', marginRight: '5%' }}>
-            <ReactHTMLTableToExcel
+            <ReactHTMLTable_ToExcel
               className="download-table-xls-button"
               table="table-to-xls"
               filename={"Expense Sheet - " + currentLoggedinUsername}
@@ -216,26 +239,7 @@ export class Check_status extends React.Component {
           </div>
         </div>
         <div>
-          <table id="table-to-xls" style={{ border: '1.5px solid black', width: '95%' }} className="table table-bordered">
-            <thead style={tableHeaderStyle}>
-              <tr>
-                <th style={tableBorderStyle} scope="col" >Creation Date</th>
-                <th style={tableBorderStyle} scope="col" >Total Amount</th>
-                <th style={tableBorderStyle} scope="col">Reason for Expense</th>
-                <th style={tableBorderStyle} scope="col">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedExpensesBySearch.map((p) => (
-                <tr scope="row">
-                  <td style={tableBorderStyle}>{p.creationDate}</td>
-                  <td style={tableBorderStyle}>{p.amount}</td>
-                  <td style={tableBorderStyle}>{p.reason}</td>
-                  <td style={tableBorderStyle}>{p.approvalStatus}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          {tableData}
         </div>
       </div>
     );
