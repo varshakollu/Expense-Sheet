@@ -48,6 +48,7 @@ var ExpenseSheet = function (_React$Component) {
     _createClass(ExpenseSheet, [{
         key: "render",
         value: function render() {
+            debugger;
             var isAdmin = props.userRoles.toUpperCase() == "ROLE_admin".toUpperCase();
             return _react2.default.createElement(
                 _reactRouterDom.HashRouter,

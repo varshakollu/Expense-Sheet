@@ -16,12 +16,12 @@ class ExpenseSheet extends React.Component {
     }
 
     render() {
+        debugger;
         const isAdmin = (props.userRoles.toUpperCase() == ("ROLE_admin").toUpperCase());
         return (
             <HashRouter>
                 <div>
                     <Route path={"/"} component={Home} />
-                    {/* <Route path={"/home"} component={Home} /> */}
                     <Route path={"/upload"} component={Upload} />
                     <Route path={"/status"} component={Check_status} />
                     <Route path={"/approve"} render={() => (

@@ -15,6 +15,8 @@ var _react2 = _interopRequireDefault(_react);
 
 var _glamor = require("glamor");
 
+var _reactToasts = require("react-toasts");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -52,7 +54,9 @@ var Upload = exports.Upload = function (_React$Component) {
         };
 
         _this.handleNameChange = _this.handleNameChange.bind(_this);
+        _this.handleAmountChange = _this.handleAmountChange.bind(_this);
         _this.handleUploadFilesChange = _this.handleUploadFilesChange.bind(_this);
+        _this.validateNameAndAmount = _this.validateNameAndAmount.bind(_this);
         _this.handleSubmit = _this.handleSubmit.bind(_this);
         _this.handleCancel = _this.handleCancel.bind(_this);
         _this.isExcel = _this.isExcel.bind(_this);
@@ -70,6 +74,15 @@ var Upload = exports.Upload = function (_React$Component) {
         value: function handleNameChange(event) {
             if (event.target.value != "") {
                 this.setState({ name: event.target.value, disableUpload: false });
+            } else {
+                this.setState({ disableUpload: true });
+            }
+        }
+    }, {
+        key: "handleAmountChange",
+        value: function handleAmountChange(event) {
+            if (event.target.value != "") {
+                this.setState({ amount: event.target.value });
             }
         }
     }, {
@@ -160,58 +173,85 @@ var Upload = exports.Upload = function (_React$Component) {
             }
         }
     }, {
+        key: "validateNameAndAmount",
+        value: function validateNameAndAmount(name, amount) {
+            if (name != undefined && amount != undefined) {
+                return true;
+            } else {
+                alert("Complete all fields in the form");
+            }
+        }
+    }, {
         key: "handleSubmit",
         value: function handleSubmit(event) {
-
-            var files = this.state.files;
-            for (var i = 0; i < files.length; i++) {
-                if (this.isExcel(files[i])) {
-                    this.state.countOfExcelFiles++;
-                    this.state.excelFileFound = true;
-                } else if (!this.isExcel(files[i])) {
-                    this.state.countOfBills++;
-                    this.state.billsFound = true;
-                }
-            }
-            if (this.state.countOfExcelFiles != 1) {
-                if (this.state.countOfExcelFiles < 1) {
-                    //save the bills in the state, request for expense sheet
-                    var confirmMessage = confirm("Please upload an Expense sheet in .xls or .xlsx or .csv format.");
-                    if (confirmMessage) {
-                        this.saveAllBillsAndRequestForExcelFile(confirmMessage);
-                    } else {
-                        this.saveAllBillsAndRequestForExcelFile(confirmMessage);
+            if (this.validateNameAndAmount(this.state.name, this.state.amount)) {
+                var files = this.state.files;
+                for (var i = 0; i < files.length; i++) {
+                    if (this.isExcel(files[i])) {
+                        this.state.countOfExcelFiles++;
+                        this.state.excelFileFound = true;
+                    } else if (!this.isExcel(files[i])) {
+                        this.state.countOfBills++;
+                        this.state.billsFound = true;
                     }
                 }
-                // If multiple excel files are found, remove excel files and save bills in the state.
-                else if (this.state.countOfExcelFiles > 1) {
-                        var confirmMessage = confirm("Please upload only one Expense sheet in .xls or .xlsx format.");
+                if (this.state.countOfExcelFiles != 1) {
+                    if (this.state.countOfExcelFiles < 1) {
+                        //save the bills in the state, request for expense sheet
+                        var confirmMessage = confirm("Please upload an Expense sheet in .xls or .xlsx or .csv format.");
                         if (confirmMessage) {
-                            this.removeExcelFilesAndSaveBills(confirmMessage);
+                            this.saveAllBillsAndRequestForExcelFile(confirmMessage);
                         } else {
-                            this.removeExcelFilesAndSaveBills(confirmMessage);
+                            this.saveAllBillsAndRequestForExcelFile(confirmMessage);
                         }
                     }
-            }
-
-            // This will execute only one expense sheet is uploaded
-            else if (this.state.countOfExcelFiles == 1 && this.state.countOfBills < 1) {
-                    // save the excel sheet in the state, request for bills
-                    var confirmMessage = confirm("Please upload all appropriate bills.");
-                    if (confirmMessage) {
-                        this.saveExcelFileAndRequestForBills(confirmMessage);
-                    } else {
-                        this.saveExcelFileAndRequestForBills(confirmMessage);
-                    }
-                } else if (this.state.countOfExcelFiles == 1 && this.state.countOfBills >= 1) {
-                    alert("Success! The entered Data is valid, will be posted to Server later.");
-                    this.setState(initialState);
-                    while (this.state.files.length > 0) {
-                        this.state.files.pop();
-                    }
-                    document.getElementById("myForm").reset();
-                    document.getElementById("uploadTable").innerHTML = "";
+                    // If multiple excel files are found, remove excel files and save bills in the state.
+                    else if (this.state.countOfExcelFiles > 1) {
+                            var confirmMessage = confirm("Please upload only one Expense sheet in .xls or .xlsx format.");
+                            if (confirmMessage) {
+                                this.removeExcelFilesAndSaveBills(confirmMessage);
+                            } else {
+                                this.removeExcelFilesAndSaveBills(confirmMessage);
+                            }
+                        }
                 }
+
+                // This will execute only one expense sheet is uploaded
+                else if (this.state.countOfExcelFiles == 1 && this.state.countOfBills < 1) {
+                        // save the excel sheet in the state, request for bills
+                        var confirmMessage = confirm("Please upload all appropriate bills.");
+                        if (confirmMessage) {
+                            this.saveExcelFileAndRequestForBills(confirmMessage);
+                        } else {
+                            this.saveExcelFileAndRequestForBills(confirmMessage);
+                        }
+                    } else if (this.state.countOfExcelFiles == 1 && this.state.countOfBills >= 1) {
+
+                        var formData = new FormData();
+                        formData.append("username", props.userName);
+                        formData.append("creationDate", new Date());
+                        formData.append("expenseName", this.state.name);
+                        formData.append("amount", this.state.amount);
+                        formData.append("status", "Submitted");
+
+                        for (var i = 0; i < files.length; i++) {
+                            formData.append("bills", files[i]);
+                        }
+                        var that = this;
+                        debugger;
+                        $.ajax({
+                            url: "/expenses",
+                            type: "POST",
+                            encType: "multipart/form-data",
+                            contentType: false,
+                            processData: false,
+                            data: formData,
+                            success: this.handleSubmitSuccess(that),
+                            error: this.handleSubmitFailure
+
+                        });
+                    }
+            }
         }
     }, {
         key: "saveAllBillsAndRequestForExcelFile",
@@ -278,13 +318,15 @@ var Upload = exports.Upload = function (_React$Component) {
         }
     }, {
         key: "handleSubmitSuccess",
-        value: function handleSubmitSuccess(data) {
-            console.log(data);
+        value: function handleSubmitSuccess(that) {
+            debugger;
+            _reactToasts.ToastStore.success("Your expense is succesfully uploaded", 5000);
+            that.handleCancel();
         }
     }, {
         key: "handleSubmitFailure",
         value: function handleSubmitFailure(error) {
-            console.log(error);
+            _reactToasts.ToastStore.success("There is an error in form submission", 5000);
         }
     }, {
         key: "render",
@@ -318,6 +360,7 @@ var Upload = exports.Upload = function (_React$Component) {
                         "Click here to download Sample Expense Sheet"
                     )
                 ),
+                _react2.default.createElement(_reactToasts.ToastContainer, { store: _reactToasts.ToastStore, position: _reactToasts.ToastContainer.POSITION.TOP_CENTER }),
                 _react2.default.createElement(
                     "form",
                     { id: "myForm" },
@@ -334,6 +377,20 @@ var Upload = exports.Upload = function (_React$Component) {
                             type: "text",
                             maxLength: "20",
                             onChange: this.handleNameChange,
+                            required: true })
+                    ),
+                    _react2.default.createElement(
+                        "div",
+                        { className: "form-group col-lg-6" },
+                        _react2.default.createElement(
+                            "label",
+                            null,
+                            "Total amount spent"
+                        ),
+                        _react2.default.createElement("input", { id: "AmountControl",
+                            className: "form-control",
+                            type: "number",
+                            onChange: this.handleAmountChange,
                             required: true })
                     ),
                     _react2.default.createElement(

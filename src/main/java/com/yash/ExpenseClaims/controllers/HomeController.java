@@ -14,18 +14,15 @@ public class HomeController {
 
     @GetMapping("/")
     public ModelAndView homeView(Authentication authentication) throws IOException {
-        String userName = authentication.getName();
-        String newUserName = userName.substring(0, 1).toUpperCase() + userName.substring(1).toLowerCase();
+        String newUserName = authentication.getName().substring(0, 1).toUpperCase() + authentication.getName().substring(1).toLowerCase();
         ModelMap model = new ModelMap();
-        model.addAttribute("currentUserRoles", authentication.getAuthorities().toArray()[0].toString());
-        model.addAttribute("currentUser", newUserName);
+        model.addAttribute("currentUserRoles", authentication.getAuthorities().toArray()[0].toString())
+             .addAttribute("currentUser", newUserName);
         return new ModelAndView("home", model);
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.GET)
-    public ModelAndView login() {
-            ModelAndView modelAndView = new ModelAndView();
-            modelAndView.setViewName("login");
-            return modelAndView;
+    public String login() {
+            return "login";
     }
 }
