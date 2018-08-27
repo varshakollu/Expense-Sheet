@@ -59,8 +59,8 @@ export class Upload extends React.Component {
         document.getElementById('hiddenFileControl').click();
     }
     handleUploadFilesChange(event) {
-        var uploadedFilesList = event.target.files;
-        for (var i = 0; i < uploadedFilesList.length; i++) {
+        let uploadedFilesList = event.target.files;
+        for (let i = 0; i < uploadedFilesList.length; i++) {
             //not executable and size<2MB
             if (this.isNotExecutableFile(uploadedFilesList[i]) && this.validateSize(uploadedFilesList[i])) {
                 this.state.files.push(uploadedFilesList[i]);
@@ -78,7 +78,7 @@ export class Upload extends React.Component {
     }
 
     validateSize(file) {
-        var fileSize = file.size / 1024 / 1024;
+        let fileSize = file.size / 1024 / 1024;
         if (fileSize < 2) {
             return true;
         } else {
@@ -87,17 +87,17 @@ export class Upload extends React.Component {
         }
     }
     updateTableHTML(updatedFiles) {
-        var table = document.getElementById("uploadTable");
+        let table = document.getElementById("uploadTable");
         table.innerHTML = "";
-        for (var i = 0; i < updatedFiles.length; ++i) {
-            var currentFile = updatedFiles[i];
+        for (let i = 0; i < updatedFiles.length; ++i) {
+            let currentFile = updatedFiles[i];
 
-            var row = table.insertRow(i);
-            var cell1 = row.insertCell(0);
-            var cell2 = row.insertCell(1);
+            let row = table.insertRow(i);
+            let cell1 = row.insertCell(0);
+            let cell2 = row.insertCell(1);
 
-            var buttonHTML = document.createElement("BUTTON");
-            var button_ID = currentFile.name + "_" + i;;
+            let buttonHTML = document.createElement("BUTTON");
+            let button_ID = currentFile.name + "_" + i;;
             buttonHTML.setAttribute("id", button_ID);
             buttonHTML.setAttribute("class", "btn btn-link");
             buttonHTML.setAttribute("type", "button");
@@ -108,14 +108,14 @@ export class Upload extends React.Component {
         this.addRemoveButtonEvents(this.state.files);
     }
     addRemoveButtonEvents(updatedFiles) {
-        var that = this;
-        for (var id = 0; id < updatedFiles.length; id++) {
-            var button_ID = updatedFiles[id].name + "_" + id;
-            var button = document.getElementById(button_ID);
+        let that = this;
+        for (let id = 0; id < updatedFiles.length; id++) {
+            let button_ID = updatedFiles[id].name + "_" + id;
+            let button = document.getElementById(button_ID);
             button.addEventListener("click", function (event) {
-                var button_ID = event.currentTarget.id;
-                var n = button_ID.lastIndexOf("_");
-                var index = button_ID.substring(n + 1);
+                let button_ID = event.currentTarget.id;
+                let n = button_ID.lastIndexOf("_");
+                let index = button_ID.substring(n + 1);
 
                 that.state.files.splice(index, 1);
                 that.updateTableHTML(that.state.files);
@@ -143,8 +143,8 @@ export class Upload extends React.Component {
 
     handleSubmit(event) {
         if (this.validateNameAndAmount(this.state.name, this.state.amount)) {
-            var files = this.state.files;
-            for (var i = 0; i < files.length; i++) {
+            let files = this.state.files;
+            for (let i = 0; i < files.length; i++) {
                 if (this.isExcel(files[i])) {
                     this.state.countOfExcelFiles++;
                     this.state.excelFileFound = true;
@@ -157,7 +157,7 @@ export class Upload extends React.Component {
             if (this.state.countOfExcelFiles != 1) {
                 if (this.state.countOfExcelFiles < 1) {
                     //save the bills in the state, request for expense sheet
-                    var confirmMessage = confirm("Please upload an Expense sheet in .xls or .xlsx or .csv format.");
+                    let confirmMessage = confirm("Please upload an Expense sheet in .xls or .xlsx or .csv format.");
                     if (confirmMessage) {
                         this.saveAllBillsAndRequestForExcelFile(confirmMessage);
                     } else {
@@ -166,7 +166,7 @@ export class Upload extends React.Component {
                 }
                 // If multiple excel files are found, remove excel files and save bills in the state.
                 else if (this.state.countOfExcelFiles > 1) {
-                    var confirmMessage = confirm("Please upload only one Expense sheet in .xls or .xlsx format.");
+                    let confirmMessage = confirm("Please upload only one Expense sheet in .xls or .xlsx format.");
                     if (confirmMessage) {
                         this.removeExcelFilesAndSaveBills(confirmMessage);
                     } else {
@@ -178,7 +178,7 @@ export class Upload extends React.Component {
             // This will execute only one expense sheet is uploaded
             else if (this.state.countOfExcelFiles == 1 && this.state.countOfBills < 1) {
                 // save the excel sheet in the state, request for bills
-                var confirmMessage = confirm("Please upload all appropriate bills.");
+                let confirmMessage = confirm("Please upload all appropriate bills.");
                 if (confirmMessage) {
                     this.saveExcelFileAndRequestForBills(confirmMessage);
                 } else {
@@ -188,18 +188,18 @@ export class Upload extends React.Component {
             else if (this.state.countOfExcelFiles == 1 && this.state.countOfBills >= 1) {
 
 
-                var formData = new FormData();
+                let formData = new FormData();
                 formData.append("username", props.userName);
                 formData.append("creationDate", new Date());
                 formData.append("expenseName", this.state.name);
                 formData.append("amount", this.state.amount);
                 formData.append("status", "Submitted");
 
-                for (var i = 0; i < files.length; i++) {
+                for (let i = 0; i < files.length; i++) {
                     formData.append("bills", files[i]);
                 }
-                var that = this;
-                debugger;
+                let that = this;
+                
                 $.ajax({
                     url: "/expenses",
                     type: "POST",
@@ -213,12 +213,11 @@ export class Upload extends React.Component {
                 });
             }
         }
-
     }
 
     saveAllBillsAndRequestForExcelFile(confirmMessage) {
-        var tempExpenseName = this.state.name;
-        var tempArray = this.state.files;
+        let tempExpenseName = this.state.name;
+        let tempArray = this.state.files;
         this.setState(initialState);
         this.setState({
             name: tempExpenseName,
@@ -227,19 +226,19 @@ export class Upload extends React.Component {
         });
     }
     removeExcelFilesAndSaveBills(confirmMessage) {
-        var tempExpenseName = this.state.name;
+        let tempExpenseName = this.state.name;
         this.setState(initialState);
         this.setState({
             name: tempExpenseName,
             disableUpload: false
         });
         //Remove all excel files and save bills temporarily.
-        var tempArray = this.state.files;
-        var that = this;
-        var excelFoundInTheArray = true;
+        let tempArray = this.state.files;
+        let that = this;
+        let excelFoundInTheArray = true;
 
         while (excelFoundInTheArray) {
-            var currentIndex = 0;
+            let currentIndex = 0;
             excelFoundInTheArray = tempArray.some(function (item, index, object) {
                 currentIndex = index;
                 return that.isExcel(item);
@@ -254,8 +253,8 @@ export class Upload extends React.Component {
         this.setState({ files: tempArray });
     }
     saveExcelFileAndRequestForBills(confirmMessage) {
-        var tempExpenseName = this.state.name;
-        var tempArray = this.state.files;
+        let tempExpenseName = this.state.name;
+        let tempArray = this.state.files;
         this.setState(initialState);
         this.setState({
             name: tempExpenseName,
@@ -274,7 +273,6 @@ export class Upload extends React.Component {
     }
 
     handleSubmitSuccess(that) {
-        debugger;
         ToastStore.success("Your expense is succesfully uploaded", 5000);
         that.handleCancel();
     }

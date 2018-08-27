@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -7,35 +7,37 @@ exports.Approve_Expenses = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _react = require("react");
+var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactRouterDom = require("react-router-dom");
-
-var _moment = require("moment");
+var _moment = require('moment');
 
 var _moment2 = _interopRequireDefault(_moment);
 
-var _reactHelmet = require("react-helmet");
+var _reactHelmet = require('react-helmet');
 
 var _reactHelmet2 = _interopRequireDefault(_reactHelmet);
 
-var _DayPickerInput = require("react-day-picker/DayPickerInput");
+var _DayPickerInput = require('react-day-picker/DayPickerInput');
 
 var _DayPickerInput2 = _interopRequireDefault(_DayPickerInput);
 
-require("react-day-picker/lib/style.css");
+require('react-day-picker/lib/style.css');
 
-var _moment3 = require("react-day-picker/moment");
+var _moment3 = require('react-day-picker/moment');
 
-require("whatwg-fetch");
+require('whatwg-fetch');
 
-var _ReactHTMLTable_ToExcel = require("./ReactHTMLTable_ToExcel");
+var _ReactHTMLTable_ToExcel = require('./ReactHTMLTable_ToExcel');
 
 var _ReactHTMLTable_ToExcel2 = _interopRequireDefault(_ReactHTMLTable_ToExcel);
 
-var _reactModal = require("react-modal");
+var _reactJsPagination = require('react-js-pagination');
+
+var _reactJsPagination2 = _interopRequireDefault(_reactJsPagination);
+
+var _reactModal = require('react-modal');
 
 var _reactModal2 = _interopRequireDefault(_reactModal);
 
@@ -61,15 +63,23 @@ var Approve_Expenses = exports.Approve_Expenses = function (_React$Component) {
     _this.filterDateRange = _this.filterDateRange.bind(_this);
     _this.searchInputChange = _this.searchInputChange.bind(_this);
     _this.clearFilters = _this.clearFilters.bind(_this);
+    _this.handlePageChange = _this.handlePageChange.bind(_this);
+    _this.handleSubmitSuccess = _this.handleSubmitSuccess.bind(_this);
+    _this.handleSubmitFailure = _this.handleSubmitFailure.bind(_this);
+    _this.onToggleDropDown = _this.onToggleDropDown.bind(_this);
     _this.handleOpenModal = _this.handleOpenModal.bind(_this);
     _this.handleCloseModal = _this.handleCloseModal.bind(_this);
     _this.state = {
       statuses: [],
       files: [],
+      renderedUsers: [],
+      renderedUsers1: [],
       searchValue: '',
       sortValue: null,
       from: undefined,
       to: undefined,
+      activePage: 1,
+      itemsCountPerPage: 5,
       showModal: false,
       currentExpenseID: 0,
       currentExpenseFirstName: '',
@@ -77,13 +87,12 @@ var Approve_Expenses = exports.Approve_Expenses = function (_React$Component) {
       currentExpenseCreationDate: 0,
       currentExpenseName: '',
       currentExpenseAmount: 0
-
     };
     return _this;
   }
 
   _createClass(Approve_Expenses, [{
-    key: "showFromMonth",
+    key: 'showFromMonth',
     value: function showFromMonth() {
       var _state = this.state,
           from = _state.from,
@@ -97,13 +106,14 @@ var Approve_Expenses = exports.Approve_Expenses = function (_React$Component) {
       }
     }
   }, {
-    key: "searchInputChange",
+    key: 'searchInputChange',
     value: function searchInputChange(event) {
       this.searchValue = event.target.value.toLowerCase();
       this.setState({ searchValue: this.searchValue });
+      this.handlePageChange(1);
     }
   }, {
-    key: "clearFilters",
+    key: 'clearFilters',
     value: function clearFilters() {
       document.getElementById("searchField").value = "";
       this.state.searchValue = '';
@@ -112,7 +122,7 @@ var Approve_Expenses = exports.Approve_Expenses = function (_React$Component) {
       this.filterDateRange(from, to);
     }
   }, {
-    key: "focusTo",
+    key: 'focusTo',
     value: function focusTo() {
       var _this2 = this;
 
@@ -121,7 +131,7 @@ var Approve_Expenses = exports.Approve_Expenses = function (_React$Component) {
       }, 0);
     }
   }, {
-    key: "handleFromChange",
+    key: 'handleFromChange',
     value: function handleFromChange(from) {
       var _this3 = this;
 
@@ -134,17 +144,15 @@ var Approve_Expenses = exports.Approve_Expenses = function (_React$Component) {
       this.filterDateRange(from, to);
     }
   }, {
-    key: "handleToChange",
+    key: 'handleToChange',
     value: function handleToChange(to) {
       this.setState({ to: to }, this.showFromMonth);
       var from = this.state.from;
       this.filterDateRange(from, to);
     }
   }, {
-    key: "filterDateRange",
+    key: 'filterDateRange',
     value: function filterDateRange(from, to) {
-      var _this4 = this;
-
       if (from == undefined) {
         from = new Date("05/20/2018");
       }
@@ -154,26 +162,61 @@ var Approve_Expenses = exports.Approve_Expenses = function (_React$Component) {
       }
 
       var currentLoggedinUsername = props.userName;
-      var query = "managername=" + currentLoggedinUsername + "&startDate=" + from + "&endDate=" + to;
-      var url = "approvals?" + query;
 
-      fetch(url).then(function (res) {
-        return res.json();
-      }).then(function (res) {
-        _this4.setState({
-          statuses: res
-        });
+      var postData = {
+        "managername": currentLoggedinUsername,
+        "startDate": from,
+        "endDate": to
+      };
+
+      $.ajax({
+        contentType: "application/json",
+        type: "GET",
+        url: "/approvals",
+        data: postData,
+        success: this.handleSubmitSuccess,
+        error: this.handleSubmitFailure
       });
     }
   }, {
-    key: "componentWillMount",
+    key: 'handleSubmitSuccess',
+    value: function handleSubmitSuccess(data) {
+      this.setState({
+        statuses: data
+      });
+      this.handlePageChange(1);
+    }
+  }, {
+    key: 'handleSubmitFailure',
+    value: function handleSubmitFailure(error) {
+      console.log(error);
+    }
+  }, {
+    key: 'componentWillMount',
     value: function componentWillMount() {
       this.filterDateRange(undefined, undefined);
     }
   }, {
-    key: "handleOpenModal",
+    key: 'handlePageChange',
+    value: function handlePageChange(pageNumber) {
+      var numberOfRecords = void 0;
+      if (document.getElementById("select") == null) {
+        numberOfRecords = 5;
+      } else {
+        numberOfRecords = Number(document.getElementById("select").value);
+      }
+      var renderedUsers1 = this.state.renderedUsers.slice((pageNumber - 1) * numberOfRecords, (pageNumber - 1) * numberOfRecords + numberOfRecords);
+      this.setState({ activePage: pageNumber, itemsCountPerPage: numberOfRecords, renderedUsers1: renderedUsers1 });
+    }
+  }, {
+    key: 'onToggleDropDown',
+    value: function onToggleDropDown() {
+      this.handlePageChange(1);
+    }
+  }, {
+    key: 'handleOpenModal',
     value: function handleOpenModal(currentExpenseID, currentExpenseFirstName, currentExpenseLastName, currentExpenseCreationDate, currentExpenseName, currentExpenseAmount) {
-      var _this5 = this;
+      var _this4 = this;
 
       this.setState({
         currentExpenseID: currentExpenseID,
@@ -184,51 +227,55 @@ var Approve_Expenses = exports.Approve_Expenses = function (_React$Component) {
         currentExpenseAmount: currentExpenseAmount
       });
 
-      debugger;
       fetch("/approvals/" + currentExpenseID).then(function (res) {
         return res.json();
       }).then(function (res) {
-        _this5.setState({
+        _this4.setState({
           files: res
         });
       });
       this.setState({ showModal: true });
     }
   }, {
-    key: "handleCloseModal",
+    key: 'handleCloseModal',
     value: function handleCloseModal() {
       this.setState({ showModal: false });
     }
   }, {
-    key: "handleFileDisplay",
-    value: function handleFileDisplay(fileID, fileType) {
+    key: 'handleFileDisplay',
+    value: function handleFileDisplay(fileID, fileName, fileType) {
 
       fetch("/approvals/" + this.state.currentExpenseID + "/file/" + fileID).then(function (response) {
         return response.blob();
       }).then(function (data) {
         debugger;
-        var url = URL.createObjectURL(new Blob([data], {
-          // type: "application/pdf"
-          type: fileType
-        }));
-        window.open(url, "_blank");
+        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+          window.navigator.msSaveOrOpenBlob(new Blob([data]), fileName);
+        } else {
+          var url = URL.createObjectURL(new Blob([data], {
+            type: fileType
+          }));
+          window.open(url, "_blank");
+        }
       });
     }
   }, {
-    key: "render",
+    key: 'render',
     value: function render() {
-      var _this6 = this;
+      var _this5 = this;
 
       var currentLoggedinUsername = props.userName;
       var _state2 = this.state,
           from = _state2.from,
           to = _state2.to;
+      var renderedUsers1 = this.state.renderedUsers1;
 
       var modifiers = { start: from, end: to };
       var dateFormat = require('dateformat');
-      var sortedExpensesBySearch = this.state.statuses.filter(function (p) {
-        if (_this6.state.searchValue) {
-          return p.firstName.toLowerCase().indexOf(_this6.state.searchValue) !== -1 || p.lastName.toLowerCase().indexOf(_this6.state.searchValue) !== -1 || p.expenseName.toLowerCase().indexOf(_this6.state.searchValue) !== -1 || p.status.toLowerCase().indexOf(_this6.state.searchValue) !== -1;
+
+      this.state.renderedUsers = this.state.statuses.filter(function (p) {
+        if (_this5.state.searchValue) {
+          return p.firstName.toLowerCase().indexOf(_this5.state.searchValue) !== -1 || p.lastName.toLowerCase().indexOf(_this5.state.searchValue) !== -1 || p.expenseName.toLowerCase().indexOf(_this5.state.searchValue) !== -1 || p.status.toLowerCase().indexOf(_this5.state.searchValue) !== -1;
         } else {
           return p;
         }
@@ -256,125 +303,257 @@ var Approve_Expenses = exports.Approve_Expenses = function (_React$Component) {
         toValue = this.state.to;
       }
 
-      var tableData;
+      var tableData = void 0;
 
-      if (sortedExpensesBySearch.length == 0) {
+      if (this.state.renderedUsers.length == 0) {
         tableData = _react2.default.createElement(
-          "div",
+          'div',
           null,
           _react2.default.createElement(
-            "h3",
+            'h3',
             null,
-            " No Records Found "
+            ' No Records Found '
           )
         );
       } else {
         tableData = _react2.default.createElement(
-          "div",
+          'div',
           null,
-          _react2.default.createElement("img", { src: "http://egov.eletsonline.com/wp-content/uploads/2017/10/yash-technologies-pvt-ltd-m-g-road-indore-2de3l.jpg", alt: "Yash Technologies", width: "150", height: "100", id: "image-xls", style: { display: 'none' } }),
+          _react2.default.createElement('img', { src: 'http://egov.eletsonline.com/wp-content/uploads/2017/10/yash-technologies-pvt-ltd-m-g-road-indore-2de3l.jpg', alt: 'Yash Technologies', width: '150', height: '100', id: 'image-xls', style: { display: 'none' } }),
           _react2.default.createElement(
-            "table",
-            { id: "table-to-xls-approval", style: { border: '1.5px solid black', width: '95%' }, className: "table table-bordered" },
+            'table',
+            { id: 'table-to-xls-approval', style: { border: '1.5px solid black', width: '95%', display: 'none' }, className: 'table table-bordered' },
             _react2.default.createElement(
-              "thead",
+              'thead',
               { style: tableHeaderStyle },
               _react2.default.createElement(
-                "tr",
+                'tr',
                 null,
                 _react2.default.createElement(
-                  "th",
-                  { style: tableBorderStyle, scope: "col" },
-                  "Expense ID"
+                  'th',
+                  { style: tableBorderStyle, scope: 'col' },
+                  'Expense ID'
                 ),
                 _react2.default.createElement(
-                  "th",
-                  { style: tableBorderStyle, scope: "col" },
-                  "First Name"
+                  'th',
+                  { style: tableBorderStyle, scope: 'col' },
+                  'First Name'
                 ),
                 _react2.default.createElement(
-                  "th",
-                  { style: tableBorderStyle, scope: "col" },
-                  "Last Name"
+                  'th',
+                  { style: tableBorderStyle, scope: 'col' },
+                  'Last Name'
                 ),
                 _react2.default.createElement(
-                  "th",
-                  { style: tableBorderStyle, scope: "col" },
-                  "Submission Date"
+                  'th',
+                  { style: tableBorderStyle, scope: 'col' },
+                  'Submission Date'
                 ),
                 _react2.default.createElement(
-                  "th",
-                  { style: tableBorderStyle, scope: "col" },
-                  "Expense Name"
+                  'th',
+                  { style: tableBorderStyle, scope: 'col' },
+                  'Expense Name'
                 ),
                 _react2.default.createElement(
-                  "th",
-                  { style: tableBorderStyle, scope: "col" },
-                  "Total Amount"
+                  'th',
+                  { style: tableBorderStyle, scope: 'col' },
+                  'Total Amount'
                 ),
                 _react2.default.createElement(
-                  "th",
-                  { style: tableBorderStyle, scope: "col" },
-                  "Status"
+                  'th',
+                  { style: tableBorderStyle, scope: 'col' },
+                  'Status'
                 )
               )
             ),
             _react2.default.createElement(
-              "tbody",
+              'tbody',
               null,
-              sortedExpensesBySearch.map(function (p) {
+              this.state.renderedUsers.map(function (p) {
                 return _react2.default.createElement(
-                  "tr",
-                  { scope: "row" },
+                  'tr',
+                  { scope: 'row' },
                   _react2.default.createElement(
-                    "td",
+                    'td',
+                    { style: tableBorderStyle },
+                    p.expenseID
+                  ),
+                  _react2.default.createElement(
+                    'td',
+                    { style: tableBorderStyle },
+                    p.firstName
+                  ),
+                  _react2.default.createElement(
+                    'td',
+                    { style: tableBorderStyle },
+                    p.lastName
+                  ),
+                  _react2.default.createElement(
+                    'td',
+                    { style: tableBorderStyle },
+                    p.creationDate
+                  ),
+                  _react2.default.createElement(
+                    'td',
+                    { style: tableBorderStyle },
+                    p.expenseName
+                  ),
+                  _react2.default.createElement(
+                    'td',
+                    { style: tableBorderStyle },
+                    '$',
+                    p.amount
+                  ),
+                  _react2.default.createElement(
+                    'td',
+                    { style: tableBorderStyle },
+                    p.status
+                  )
+                );
+              })
+            )
+          ),
+          _react2.default.createElement(
+            'table',
+            { id: 'table-to-xls-approval-1', style: { border: '1.5px solid black', width: '95%' }, className: 'table table-bordered' },
+            _react2.default.createElement(
+              'thead',
+              { style: tableHeaderStyle },
+              _react2.default.createElement(
+                'tr',
+                null,
+                _react2.default.createElement(
+                  'th',
+                  { style: tableBorderStyle, scope: 'col' },
+                  'Expense ID'
+                ),
+                _react2.default.createElement(
+                  'th',
+                  { style: tableBorderStyle, scope: 'col' },
+                  'First Name'
+                ),
+                _react2.default.createElement(
+                  'th',
+                  { style: tableBorderStyle, scope: 'col' },
+                  'Last Name'
+                ),
+                _react2.default.createElement(
+                  'th',
+                  { style: tableBorderStyle, scope: 'col' },
+                  'Submission Date'
+                ),
+                _react2.default.createElement(
+                  'th',
+                  { style: tableBorderStyle, scope: 'col' },
+                  'Expense Name'
+                ),
+                _react2.default.createElement(
+                  'th',
+                  { style: tableBorderStyle, scope: 'col' },
+                  'Total Amount'
+                ),
+                _react2.default.createElement(
+                  'th',
+                  { style: tableBorderStyle, scope: 'col' },
+                  'Status'
+                )
+              )
+            ),
+            _react2.default.createElement(
+              'tbody',
+              null,
+              renderedUsers1.map(function (p) {
+                return _react2.default.createElement(
+                  'tr',
+                  { scope: 'row' },
+                  _react2.default.createElement(
+                    'td',
                     { style: tableBorderStyle },
                     _react2.default.createElement(
-                      "button",
+                      'button',
                       {
-                        className: "btn btn-link",
+                        className: 'btn btn-link',
                         onClick: function onClick() {
-                          _this6.handleOpenModal(p.expenseID, p.firstName, p.lastName, p.creationDate, p.expenseName, p.amount);
+                          _this5.handleOpenModal(p.expenseID, p.firstName, p.lastName, p.creationDate, p.expenseName, p.amount);
                         } },
                       _react2.default.createElement(
-                        "strong",
+                        'strong',
                         null,
                         p.expenseID
                       )
                     )
                   ),
                   _react2.default.createElement(
-                    "td",
+                    'td',
                     { style: tableBorderStyle },
                     p.firstName
                   ),
                   _react2.default.createElement(
-                    "td",
+                    'td',
                     { style: tableBorderStyle },
                     p.lastName
                   ),
                   _react2.default.createElement(
-                    "td",
+                    'td',
                     { style: tableBorderStyle },
                     p.creationDate
                   ),
                   _react2.default.createElement(
-                    "td",
+                    'td',
                     { style: tableBorderStyle },
                     p.expenseName
                   ),
                   _react2.default.createElement(
-                    "td",
+                    'td',
                     { style: tableBorderStyle },
-                    "$",
+                    '$',
                     p.amount
                   ),
                   _react2.default.createElement(
-                    "td",
+                    'td',
                     { style: tableBorderStyle },
                     p.status
                   )
                 );
+              })
+            )
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            _react2.default.createElement(
+              'select',
+              { style: { float: 'left', marginLeft: '1%', marginTop: '2%', width: '6%' }, id: 'select', name: 'group', className: 'form-control', size: '1', onChange: this.onToggleDropDown },
+              _react2.default.createElement(
+                'option',
+                { value: '5' },
+                '5'
+              ),
+              _react2.default.createElement(
+                'option',
+                { value: '10' },
+                '10'
+              ),
+              _react2.default.createElement(
+                'option',
+                { value: '25' },
+                '25'
+              )
+            ),
+            _react2.default.createElement(
+              'div',
+              { style: { float: 'right', marginRight: '5%', marginBottom: '10%' } },
+              _react2.default.createElement(_reactJsPagination2.default, {
+                hideDisabled: true,
+                prevPageText: 'prev',
+                nextPageText: 'next',
+                firstPageText: 'first',
+                lastPageText: 'last',
+                activePage: this.state.activePage,
+                itemsCountPerPage: this.state.itemsCountPerPage,
+                totalItemsCount: this.state.renderedUsers.length,
+                pageRangeDisplayed: 5,
+                onChange: this.handlePageChange
               })
             )
           )
@@ -382,20 +561,20 @@ var Approve_Expenses = exports.Approve_Expenses = function (_React$Component) {
       }
 
       return _react2.default.createElement(
-        "div",
+        'div',
         { style: { marginLeft: '17%' } },
         _react2.default.createElement(
-          "h3",
+          'h3',
           { style: { marginBottom: '2%' } },
-          "Approval Status"
+          'Approval Status'
         ),
         _react2.default.createElement(
-          "div",
-          { className: "InputFromTo", style: { marginBottom: '2%' } },
+          'div',
+          { className: 'InputFromTo', style: { marginBottom: '2%' } },
           _react2.default.createElement(_DayPickerInput2.default, {
             value: from,
-            placeholder: " From",
-            format: "LL",
+            placeholder: ' From',
+            format: 'LL',
             formatDate: _moment3.formatDate,
             parseDate: _moment3.parseDate,
             dayPickerProps: {
@@ -409,24 +588,24 @@ var Approve_Expenses = exports.Approve_Expenses = function (_React$Component) {
               modifiers: modifiers,
               numberOfMonths: 2,
               onDayClick: function onDayClick() {
-                return _this6.to.getInput().focus();
+                return _this5.to.getInput().focus();
               }
             },
             onDayChange: this.handleFromChange
           }),
           ' ',
-          "\u2014",
+          '\u2014',
           ' ',
           _react2.default.createElement(
-            "span",
-            { className: "InputFromTo-to" },
+            'span',
+            { className: 'InputFromTo-to' },
             _react2.default.createElement(_DayPickerInput2.default, {
               ref: function ref(el) {
-                return _this6.to = el;
+                return _this5.to = el;
               },
               value: to,
-              placeholder: " To",
-              format: "LL",
+              placeholder: ' To',
+              format: 'LL',
               formatDate: _moment3.formatDate,
               parseDate: _moment3.parseDate,
               dayPickerProps: {
@@ -447,38 +626,53 @@ var Approve_Expenses = exports.Approve_Expenses = function (_React$Component) {
             _reactHelmet2.default,
             null,
             _react2.default.createElement(
-              "style",
+              'style',
               null,
-              "\n  .InputFromTo .DayPicker-Day--selected:not(.DayPicker-Day--start):not(.DayPicker-Day--end):not(.DayPicker-Day--outside) {\n    background-color: #f0f8ff !important;\n    color: #4a90e2;\n  }\n  .InputFromTo .DayPicker-Day {\n    border-radius: 0 !important;\n  }\n  .InputFromTo .DayPicker-Day--start {\n    border-top-left-radius: 50% !important;\n    border-bottom-left-radius: 50% !important;\n  }\n  .InputFromTo .DayPicker-Day--end {\n    border-top-right-radius: 50% !important;\n    border-bottom-right-radius: 50% !important;\n  }\n  .InputFromTo .DayPickerInput-Overlay {\n    width: 550px;\n  }\n  .InputFromTo-to .DayPickerInput-Overlay {\n    margin-left: -198px;\n  }\n"
+              '\n  .InputFromTo .DayPicker-Day--selected:not(.DayPicker-Day--start):not(.DayPicker-Day--end):not(.DayPicker-Day--outside) {\n    background-color: #f0f8ff !important;\n    color: #4a90e2;\n  }\n  .InputFromTo .DayPicker-Day {\n    border-radius: 0 !important;\n  }\n  .InputFromTo .DayPicker-Day--start {\n    border-top-left-radius: 50% !important;\n    border-bottom-left-radius: 50% !important;\n  }\n  .InputFromTo .DayPicker-Day--end {\n    border-top-right-radius: 50% !important;\n    border-bottom-right-radius: 50% !important;\n  }\n  .InputFromTo .DayPickerInput-Overlay {\n    width: 550px;\n  }\n  .InputFromTo-to .DayPickerInput-Overlay {\n    margin-left: -198px;\n  }\n'
             )
           )
         ),
         _react2.default.createElement(
-          "div",
+          'div',
           { style: { float: 'none', marginBottom: '2%' } },
-          _react2.default.createElement("input", { id: "searchField", style: { width: '27%', display: 'inline-block' }, className: "form-control", type: "text", placeholder: "Search First/Last/Expense Name, Status", onChange: this.searchInputChange, "aria-label": "Search" }),
+          _react2.default.createElement('input', { id: 'searchField', style: { width: '27%', display: 'inline-block' }, className: 'form-control', type: 'text', placeholder: 'Search First/Last/Expense Name, Status', onChange: this.searchInputChange, 'aria-label': 'Search' }),
           _react2.default.createElement(
-            "button",
-            { type: "submit", style: { marginLeft: '1%' }, className: "btn btn-primary btn-sm", onClick: function onClick() {
-                return _this6.clearFilters();
+            'button',
+            { type: 'submit', style: { marginLeft: '1%' }, className: 'btn btn-primary btn-sm', onClick: function onClick() {
+                return _this5.clearFilters();
               } },
-            "Clear Filters"
+            'Clear Filters'
           ),
           _react2.default.createElement(
-            "div",
+            'div',
             { style: { float: 'right', marginRight: '5%' } },
             _react2.default.createElement(_ReactHTMLTable_ToExcel2.default, {
-              className: "download-table-xls-button",
-              table: "table-to-xls-approval",
+              className: 'download-table-xls-button',
+              table: 'table-to-xls-approval',
               filename: "Expense Approvals - " + currentLoggedinUsername,
-              sheet: "Expense Approval Sheet",
-              buttonText: "Download",
-              img: "image-xls",
+              sheet: 'Expense Approval Sheet',
+              buttonText: 'Download',
+              img: 'image-xls',
               dates: "Expense Report (" + dateFormat(fromValue, "mmm d, yyyy") + "-" + dateFormat(toValue, "mmm d, yyyy") + ")" })
           )
         ),
         _react2.default.createElement(
-          "div",
+          'div',
+          { className: 'alert alert-info', role: 'alert', style: { width: '40%' } },
+          _react2.default.createElement(
+            'strong',
+            null,
+            'Note: '
+          ),
+          'Clear all the filters to download entire history.'
+        ),
+        _react2.default.createElement(
+          'div',
+          null,
+          tableData
+        ),
+        _react2.default.createElement(
+          'div',
           null,
           _react2.default.createElement(
             _reactModal2.default,
@@ -487,146 +681,141 @@ var Approve_Expenses = exports.Approve_Expenses = function (_React$Component) {
               onRequestClose: this.handleCloseModal
             },
             _react2.default.createElement(
-              "div",
+              'div',
               null,
               _react2.default.createElement(
-                "h4",
+                'h4',
                 null,
                 _react2.default.createElement(
-                  "strong",
+                  'strong',
                   null,
-                  "Expense information for ID : "
+                  'Expense information for ID : '
                 ),
                 this.state.currentExpenseID
               ),
-              _react2.default.createElement("br", null),
+              _react2.default.createElement('br', null),
               _react2.default.createElement(
-                "p",
+                'p',
                 null,
                 _react2.default.createElement(
-                  "strong",
+                  'strong',
                   null,
-                  "First name : "
+                  'First name : '
                 ),
-                " ",
+                ' ',
                 this.state.currentExpenseFirstName
               ),
-              _react2.default.createElement("br", null),
+              _react2.default.createElement('br', null),
               _react2.default.createElement(
-                "p",
+                'p',
                 null,
                 _react2.default.createElement(
-                  "strong",
+                  'strong',
                   null,
-                  "Last name : "
+                  'Last name : '
                 ),
                 this.state.currentExpenseLastName
               ),
-              _react2.default.createElement("br", null),
+              _react2.default.createElement('br', null),
               _react2.default.createElement(
-                "p",
+                'p',
                 null,
                 _react2.default.createElement(
-                  "strong",
+                  'strong',
                   null,
-                  "Submission date : "
+                  'Submission date : '
                 ),
                 this.state.currentExpenseCreationDate
               ),
-              _react2.default.createElement("br", null),
+              _react2.default.createElement('br', null),
               _react2.default.createElement(
-                "p",
+                'p',
                 null,
                 _react2.default.createElement(
-                  "strong",
+                  'strong',
                   null,
-                  "Expense name: "
+                  'Expense name: '
                 ),
                 this.state.currentExpenseName
               ),
-              _react2.default.createElement("br", null),
+              _react2.default.createElement('br', null),
               _react2.default.createElement(
-                "p",
+                'p',
                 null,
                 _react2.default.createElement(
-                  "strong",
+                  'strong',
                   null,
-                  "Amount : "
+                  'Amount : '
                 ),
                 this.state.currentExpenseAmount
               ),
-              _react2.default.createElement("br", null),
+              _react2.default.createElement('br', null),
               _react2.default.createElement(
-                "p",
+                'p',
                 null,
                 _react2.default.createElement(
-                  "strong",
+                  'strong',
                   null,
-                  "Attachments : "
+                  'Attachments : '
                 )
               ),
               _react2.default.createElement(
-                "form",
+                'form',
                 null,
                 this.state.files.map(function (p) {
                   return _react2.default.createElement(
-                    "ul",
-                    { className: "form-group col-lg-8" },
+                    'ul',
+                    { className: 'form-group col-lg-8' },
                     _react2.default.createElement(
-                      "li",
+                      'li',
                       null,
                       _react2.default.createElement(
-                        "button",
-                        { className: "btn btn-link", type: "button",
+                        'button',
+                        { className: 'btn btn-link', type: 'button',
                           onClick: function onClick() {
-                            _this6.handleFileDisplay(p.fileID, p.fileType);
+                            _this5.handleFileDisplay(p.fileID, p.fileName, p.fileType);
                           } },
                         p.fileName
                       )
                     )
                   );
                 }),
-                _react2.default.createElement("br", null),
+                _react2.default.createElement('br', null),
                 _react2.default.createElement(
-                  "div",
-                  { className: "form-group col-lg-8" },
+                  'div',
+                  { className: 'form-group col-lg-8' },
                   _react2.default.createElement(
-                    "label",
+                    'label',
                     null,
-                    "Comment:"
+                    'Comment:'
                   ),
-                  _react2.default.createElement("textarea", { className: "form-control", rows: "5", id: "comment" }),
-                  _react2.default.createElement("br", null),
+                  _react2.default.createElement('textarea', { className: 'form-control', rows: '5', id: 'comment' }),
+                  _react2.default.createElement('br', null),
                   _react2.default.createElement(
-                    "div",
-                    { "class": "alert alert-info", role: "alert" },
+                    'div',
+                    { className: 'alert alert-info', role: 'alert' },
                     _react2.default.createElement(
-                      "strong",
+                      'strong',
                       null,
-                      "Heads up!"
+                      'Heads up!'
                     ),
-                    " Review all the expense information and attachments before approving this expense. You cannot revert once it is approved."
+                    ' Review all the expense information and attachments before approving this expense. You cannot revert once it is approved.'
                   ),
-                  _react2.default.createElement("br", null),
+                  _react2.default.createElement('br', null),
                   _react2.default.createElement(
-                    "button",
-                    { className: "btn btn-primary", type: "button", onClick: this.handleCloseModal },
-                    "Approve"
+                    'button',
+                    { className: 'btn btn-primary', type: 'button', onClick: this.handleCloseModal },
+                    'Approve'
                   ),
                   _react2.default.createElement(
-                    "button",
-                    { className: "btn btn-link", type: "button", onClick: this.handleCloseModal },
-                    "Close"
+                    'button',
+                    { className: 'btn btn-link', type: 'button', onClick: this.handleCloseModal },
+                    'Close'
                   )
                 )
               )
             )
           )
-        ),
-        _react2.default.createElement(
-          "div",
-          null,
-          tableData
         )
       );
     }

@@ -3,11 +3,9 @@ package com.yash.ExpenseClaims.repositories;
 import com.yash.ExpenseClaims.dto.ExpenseDto;
 import com.yash.ExpenseClaims.utility.DateUtility;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
-
 import javax.sql.DataSource;
 import java.sql.Blob;
 import java.sql.ResultSet;
@@ -22,9 +20,6 @@ public class ApproveExpenseRepository {
 
     @Autowired
     private DataSource dataSource;
-
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -72,13 +67,14 @@ public class ApproveExpenseRepository {
                 expenseDto.setFileID(rs.getInt(1));
                 expenseDto.setFileType(rs.getString(2));
                 expenseDto.setFileName(rs.getString(3));
-                return expenseDto;
+            return expenseDto;
             }
         });
         return list;
     }
 
     public List<byte[]> retrieveSingleFile(int expenseID, int fileID) {
+
         String sql = "select file FROM expensefiles where expenseID = :expenseID AND fileID = :fileID;";
 
         Map<String, Object> parameterMap = new HashMap<>();
@@ -93,6 +89,5 @@ public class ApproveExpenseRepository {
             }
         });
         return list;
-
     }
 }

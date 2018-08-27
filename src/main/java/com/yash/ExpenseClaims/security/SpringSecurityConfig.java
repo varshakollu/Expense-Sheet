@@ -10,8 +10,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import javax.sql.DataSource;
 
-import static org.springframework.http.HttpMethod.*;
-
 @Configuration
 @EnableWebSecurity
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -34,9 +32,6 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.csrf().disable()
                 .authorizeRequests()
-                .antMatchers(POST, "/users").hasAnyRole("admin")
-                .antMatchers(PUT, "/users").hasAnyRole("admin")
-                .antMatchers(DELETE, "/users").hasAnyRole("admin")
                 .antMatchers("/login").permitAll()
                 .anyRequest().authenticated()
                 .and()

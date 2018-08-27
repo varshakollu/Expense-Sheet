@@ -28,7 +28,9 @@ var propTypes = {
   sheet: _propTypes2.default.string.isRequired,
   id: _propTypes2.default.string,
   className: _propTypes2.default.string,
-  buttonText: _propTypes2.default.string
+  buttonText: _propTypes2.default.string,
+  img: _propTypes2.default.string.isRequired,
+  dates: _propTypes2.default.string.isRequired
 };
 
 var defaultProps = {
@@ -71,18 +73,22 @@ var ReactHTMLTable_ToExcel = function (_Component) {
       var table = document.getElementById(this.props.table).outerHTML;
       var sheet = String(this.props.sheet);
       var filename = String(this.props.filename) + '.xls';
-
+      var img = document.getElementById(this.props.img).outerHTML;
+      var dates = String(this.props.dates);
       var uri = 'data:application/vnd.ms-excel;base64,';
-      var template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-mic' + 'rosoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta cha' + 'rset="UTF-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:Exce' + 'lWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/>' + '</x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></' + 'xml><![endif]--></head><body>{table}</body></html>';
+      debugger;
+      var template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-mic' + 'rosoft-com:office:excel" xmlns="https://www.w3.org/TR/html401"><head><meta cha' + 'rset="UTF-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:Exce' + 'lWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/>' + '</x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></' + 'xml><![endif]--></head><body><div>{img}<br><b>{dates}</b></div><div>{table}</div></body></html>';
 
       var context = {
         worksheet: sheet || 'Worksheet',
+        img: img,
+        dates: dates,
         table: table
       };
 
       // If IE11
       if (window.navigator.msSaveOrOpenBlob) {
-        var fileData = ['' + ('<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-mic' + 'rosoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta cha' + 'rset="UTF-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:Exce' + 'lWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/>' + '</x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></' + 'xml><![endif]--></head><body>') + table + '</body></html>'];
+        var fileData = ['' + ('<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-mic' + 'rosoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta cha' + 'rset="UTF-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:Exce' + 'lWorksheet><x:Name>') + sheet + '</x:Name><x:WorksheetOptions><x:DisplayGridlines/>\' + \'</x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></\' + \'xml><![endif]--></head><body>\'}<div>' + img + '<br><b>' + dates + '</b></div><div>' + table + '</div></body></html>'];
         var blobObject = new Blob(fileData);
         window.navigator.msSaveOrOpenBlob(blobObject, filename);
         return true;

@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import moment from 'moment';
 import Helmet from 'react-helmet';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
@@ -7,6 +6,7 @@ import 'react-day-picker/lib/style.css';
 import { formatDate, parseDate } from "react-day-picker/moment";
 import 'whatwg-fetch';
 import ReactHTMLTable_ToExcel from "./ReactHTMLTable_ToExcel";
+import Pagination from "react-js-pagination";
 import ReactModal from 'react-modal';
 
 export class Approve_Expenses extends React.Component {
@@ -19,15 +19,23 @@ export class Approve_Expenses extends React.Component {
     this.filterDateRange = this.filterDateRange.bind(this);
     this.searchInputChange = this.searchInputChange.bind(this);
     this.clearFilters = this.clearFilters.bind(this);
+    this.handlePageChange = this.handlePageChange.bind(this);
+    this.handleSubmitSuccess = this.handleSubmitSuccess.bind(this);
+    this.handleSubmitFailure = this.handleSubmitFailure.bind(this);
+    this.onToggleDropDown = this.onToggleDropDown.bind(this);
     this.handleOpenModal = this.handleOpenModal.bind(this);
     this.handleCloseModal = this.handleCloseModal.bind(this);
     this.state = {
       statuses: [],
       files: [],
+      renderedUsers: [],
+      renderedUsers1: [],
       searchValue: '',
       sortValue: null,
       from: undefined,
       to: undefined,
+      activePage: 1,
+      itemsCountPerPage: 5,
       showModal: false,
       currentExpenseID: 0,
       currentExpenseFirstName: '',
@@ -35,7 +43,6 @@ export class Approve_Expenses extends React.Component {
       currentExpenseCreationDate: 0,
       currentExpenseName: '',
       currentExpenseAmount: 0
-
     };
   }
 
@@ -52,13 +59,14 @@ export class Approve_Expenses extends React.Component {
   searchInputChange(event) {
     this.searchValue = event.target.value.toLowerCase();
     this.setState({ searchValue: this.searchValue });
+    this.handlePageChange(1);
   }
 
   clearFilters() {
     document.getElementById("searchField").value = "";
     this.state.searchValue = '';
-    var from = this.state.from = undefined;
-    var to = this.state.to = undefined;
+    const from = this.state.from = undefined;
+    const to = this.state.to = undefined;
     this.filterDateRange(from, to);
   }
 
@@ -72,13 +80,13 @@ export class Approve_Expenses extends React.Component {
         this.focusTo();
       }
     });
-    var to = this.state.to;
+    const to = this.state.to;
     this.filterDateRange(from, to);
   }
 
   handleToChange(to) {
     this.setState({ to }, this.showFromMonth);
-    var from = this.state.from;
+    const from = this.state.from;
     this.filterDateRange(from, to);
   }
 
@@ -92,20 +100,52 @@ export class Approve_Expenses extends React.Component {
     }
 
     const currentLoggedinUsername = props.userName;
-    let query = "managername=" + currentLoggedinUsername + "&startDate=" + from + "&endDate=" + to;
-    let url = "approvals?" + query
 
-    fetch(url)
-      .then(res => res.json())
-      .then(res => {
-        this.setState({
-          statuses: res
-        });
-      });
+    const postData = {
+      "managername": currentLoggedinUsername,
+      "startDate": from,
+      "endDate": to
+    };
+  
+    $.ajax({
+      contentType: "application/json",
+      type: "GET",
+      url: "/approvals",
+      data: postData,
+      success: this.handleSubmitSuccess,
+      error: this.handleSubmitFailure,
+    });
+  }
+
+  handleSubmitSuccess(data) {
+    this.setState({
+      statuses: data
+    });
+    this.handlePageChange(1);
+  }
+
+  handleSubmitFailure(error) {
+    console.log(error);
   }
 
   componentWillMount() {
     this.filterDateRange(undefined, undefined);
+  }
+
+  handlePageChange(pageNumber) {
+    let numberOfRecords;
+    if (document.getElementById("select") == null) {
+      numberOfRecords = 5;
+    }
+    else {
+      numberOfRecords = Number(document.getElementById("select").value);
+    }
+    const renderedUsers1 = this.state.renderedUsers.slice((pageNumber - 1) * numberOfRecords, (pageNumber - 1) * numberOfRecords + numberOfRecords);
+    this.setState({ activePage: pageNumber, itemsCountPerPage: numberOfRecords, renderedUsers1 });
+  }
+
+  onToggleDropDown() {
+    this.handlePageChange(1);
   }
 
   handleOpenModal(currentExpenseID, currentExpenseFirstName, currentExpenseLastName, currentExpenseCreationDate, currentExpenseName, currentExpenseAmount) {
@@ -118,7 +158,6 @@ export class Approve_Expenses extends React.Component {
       currentExpenseAmount: currentExpenseAmount
     });
 
-    debugger;
     fetch("/approvals/" + currentExpenseID)
       .then(res => res.json())
       .then(res => {
@@ -133,7 +172,7 @@ export class Approve_Expenses extends React.Component {
     this.setState({ showModal: false });
   }
 
-  handleFileDisplay(fileID, fileType) {
+  handleFileDisplay(fileID, fileName, fileType) {
 
     fetch("/approvals/" + this.state.currentExpenseID + "/file/" + fileID)
       .then(function (response) {
@@ -141,21 +180,27 @@ export class Approve_Expenses extends React.Component {
       })
       .then(function (data) {
         debugger;
-        var url = URL.createObjectURL(new Blob([data], {
-          // type: "application/pdf"
-          type: fileType
-        }));
-        window.open(url, "_blank");
+        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+          window.navigator.msSaveOrOpenBlob(new Blob([data]), fileName);
+        } else {
+          var url = URL.createObjectURL(new Blob([data], {
+            type: fileType
+          }));
+          window.open(url, "_blank");
+        }
+
+
       });
   }
-
 
   render() {
     const currentLoggedinUsername = props.userName;
     const { from, to } = this.state;
+    const { renderedUsers1 } = this.state;
     const modifiers = { start: from, end: to };
     const dateFormat = require('dateformat');
-    let sortedExpensesBySearch = this.state.statuses.filter(
+
+    this.state.renderedUsers = this.state.statuses.filter(
       (p) => {
         if (this.state.searchValue) {
           return p.firstName.toLowerCase().indexOf(this.state.searchValue) !== -1 || p.lastName.toLowerCase().indexOf(this.state.searchValue) !== -1 || p.expenseName.toLowerCase().indexOf(this.state.searchValue) !== -1 || p.status.toLowerCase().indexOf(this.state.searchValue) !== -1;
@@ -166,11 +211,11 @@ export class Approve_Expenses extends React.Component {
       }
     );
 
-    var tableBorderStyle = {
+    const tableBorderStyle = {
       border: '1.5px solid black'
     };
 
-    var tableHeaderStyle = {
+    const tableHeaderStyle = {
       backgroundColor: 'lightblue'
     };
 
@@ -188,15 +233,16 @@ export class Approve_Expenses extends React.Component {
       toValue = this.state.to;
     }
 
-    var tableData;
+    let tableData;
 
-    if (sortedExpensesBySearch.length == 0) {
+    if (this.state.renderedUsers.length == 0) {
       tableData = <div><h3> No Records Found </h3></div>
     }
+
     else {
       tableData = <div>
         <img src="http://egov.eletsonline.com/wp-content/uploads/2017/10/yash-technologies-pvt-ltd-m-g-road-indore-2de3l.jpg" alt="Yash Technologies" width="150" height="100" id="image-xls" style={{ display: 'none' }} />
-        <table id="table-to-xls-approval" style={{ border: '1.5px solid black', width: '95%' }} className="table table-bordered">
+        <table id="table-to-xls-approval" style={{ border: '1.5px solid black', width: '95%', display: 'none' }} className="table table-bordered">
           <thead style={tableHeaderStyle}>
             <tr>
               <th style={tableBorderStyle} scope="col" >Expense ID</th>
@@ -209,7 +255,33 @@ export class Approve_Expenses extends React.Component {
             </tr>
           </thead>
           <tbody>
-            {sortedExpensesBySearch.map((p) => (
+            {this.state.renderedUsers.map((p) => (
+              <tr scope="row">
+                <td style={tableBorderStyle}>{p.expenseID}</td>
+                <td style={tableBorderStyle}>{p.firstName}</td>
+                <td style={tableBorderStyle}>{p.lastName}</td>
+                <td style={tableBorderStyle}>{p.creationDate}</td>
+                <td style={tableBorderStyle}>{p.expenseName}</td>
+                <td style={tableBorderStyle}>${p.amount}</td>
+                <td style={tableBorderStyle}>{p.status}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <table id="table-to-xls-approval-1" style={{ border: '1.5px solid black', width: '95%' }} className="table table-bordered">
+          <thead style={tableHeaderStyle}>
+            <tr>
+              <th style={tableBorderStyle} scope="col" >Expense ID</th>
+              <th style={tableBorderStyle} scope="col" >First Name</th>
+              <th style={tableBorderStyle} scope="col" >Last Name</th>
+              <th style={tableBorderStyle} scope="col" >Submission Date</th>
+              <th style={tableBorderStyle} scope="col">Expense Name</th>
+              <th style={tableBorderStyle} scope="col" >Total Amount</th>
+              <th style={tableBorderStyle} scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {renderedUsers1.map((p) => (
               <tr scope="row">
                 <td style={tableBorderStyle}>
                   <button
@@ -227,6 +299,27 @@ export class Approve_Expenses extends React.Component {
             ))}
           </tbody>
         </table>
+        <div>
+          <select style={{ float: 'left', marginLeft: '1%', marginTop: '2%', width: '6%' }} id='select' name='group' className='form-control' size='1' onChange={this.onToggleDropDown}>
+            <option value='5'>5</option>
+            <option value='10'>10</option>
+            <option value='25'>25</option>
+          </select>
+          <div style={{ float: 'right', marginRight: '5%', marginBottom: '10%' }}>
+            <Pagination
+              hideDisabled
+              prevPageText='prev'
+              nextPageText='next'
+              firstPageText='first'
+              lastPageText='last'
+              activePage={this.state.activePage}
+              itemsCountPerPage={this.state.itemsCountPerPage}
+              totalItemsCount={this.state.renderedUsers.length}
+              pageRangeDisplayed={5}
+              onChange={this.handlePageChange}
+            />
+          </div>
+        </div>
       </div>
     }
 
@@ -319,6 +412,12 @@ export class Approve_Expenses extends React.Component {
               dates={"Expense Report (" + dateFormat(fromValue, "mmm d, yyyy") + "-" + dateFormat(toValue, "mmm d, yyyy") + ")"} />
           </div>
         </div>
+        <div className="alert alert-info" role="alert" style={{ width: '40%' }}>
+          <strong>Note: </strong>Clear all the filters to download entire history.
+        </div>
+        <div>
+          {tableData}
+        </div>
         <div>
           <ReactModal
             isOpen={this.state.showModal}
@@ -343,7 +442,7 @@ export class Approve_Expenses extends React.Component {
                   <ul className="form-group col-lg-8">
                     <li>
                       <button className="btn btn-link" type="button"
-                        onClick={() => { this.handleFileDisplay(p.fileID, p.fileType) }}>
+                         onClick={() => { this.handleFileDisplay(p.fileID, p.fileName, p.fileType) }}>
                         {p.fileName}
                       </button>
                     </li>
@@ -354,7 +453,7 @@ export class Approve_Expenses extends React.Component {
                   <label>Comment:</label>
                   <textarea className="form-control" rows="5" id="comment"></textarea>
                   <br />
-                  <div class="alert alert-info" role="alert">
+                  <div className="alert alert-info" role="alert">
                     <strong>Heads up!</strong> Review all the expense information and attachments before approving this expense.
                     You cannot revert once it is approved.
                   </div>
@@ -367,11 +466,7 @@ export class Approve_Expenses extends React.Component {
             </div>
           </ReactModal>
         </div>
-
-        <div>
-          {tableData}
-        </div>
-      </div >
+      </div>
     );
   }
 }

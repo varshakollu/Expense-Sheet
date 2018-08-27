@@ -207,11 +207,11 @@ var Upload = exports.Upload = function (_React$Component) {
                     }
                     // If multiple excel files are found, remove excel files and save bills in the state.
                     else if (this.state.countOfExcelFiles > 1) {
-                            var confirmMessage = confirm("Please upload only one Expense sheet in .xls or .xlsx format.");
-                            if (confirmMessage) {
-                                this.removeExcelFilesAndSaveBills(confirmMessage);
+                            var _confirmMessage = confirm("Please upload only one Expense sheet in .xls or .xlsx format.");
+                            if (_confirmMessage) {
+                                this.removeExcelFilesAndSaveBills(_confirmMessage);
                             } else {
-                                this.removeExcelFilesAndSaveBills(confirmMessage);
+                                this.removeExcelFilesAndSaveBills(_confirmMessage);
                             }
                         }
                 }
@@ -219,11 +219,11 @@ var Upload = exports.Upload = function (_React$Component) {
                 // This will execute only one expense sheet is uploaded
                 else if (this.state.countOfExcelFiles == 1 && this.state.countOfBills < 1) {
                         // save the excel sheet in the state, request for bills
-                        var confirmMessage = confirm("Please upload all appropriate bills.");
-                        if (confirmMessage) {
-                            this.saveExcelFileAndRequestForBills(confirmMessage);
+                        var _confirmMessage2 = confirm("Please upload all appropriate bills.");
+                        if (_confirmMessage2) {
+                            this.saveExcelFileAndRequestForBills(_confirmMessage2);
                         } else {
-                            this.saveExcelFileAndRequestForBills(confirmMessage);
+                            this.saveExcelFileAndRequestForBills(_confirmMessage2);
                         }
                     } else if (this.state.countOfExcelFiles == 1 && this.state.countOfBills >= 1) {
 
@@ -234,11 +234,11 @@ var Upload = exports.Upload = function (_React$Component) {
                         formData.append("amount", this.state.amount);
                         formData.append("status", "Submitted");
 
-                        for (var i = 0; i < files.length; i++) {
-                            formData.append("bills", files[i]);
+                        for (var _i = 0; _i < files.length; _i++) {
+                            formData.append("bills", files[_i]);
                         }
                         var that = this;
-                        debugger;
+
                         $.ajax({
                             url: "/expenses",
                             type: "POST",
@@ -319,7 +319,6 @@ var Upload = exports.Upload = function (_React$Component) {
     }, {
         key: "handleSubmitSuccess",
         value: function handleSubmitSuccess(that) {
-            debugger;
             _reactToasts.ToastStore.success("Your expense is succesfully uploaded", 5000);
             that.handleCancel();
         }

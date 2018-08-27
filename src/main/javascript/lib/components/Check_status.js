@@ -33,6 +33,10 @@ var _ReactHTMLTable_ToExcel = require('./ReactHTMLTable_ToExcel');
 
 var _ReactHTMLTable_ToExcel2 = _interopRequireDefault(_ReactHTMLTable_ToExcel);
 
+var _reactJsPagination = require('react-js-pagination');
+
+var _reactJsPagination2 = _interopRequireDefault(_reactJsPagination);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -55,13 +59,20 @@ var Check_status = exports.Check_status = function (_React$Component) {
     _this.filterDateRange = _this.filterDateRange.bind(_this);
     _this.searchInputChange = _this.searchInputChange.bind(_this);
     _this.clearFilters = _this.clearFilters.bind(_this);
-    // this.handlePagination = this.handlePagination.bind(this);
+    _this.handlePageChange = _this.handlePageChange.bind(_this);
+    _this.handleSubmitSuccess = _this.handleSubmitSuccess.bind(_this);
+    _this.handleSubmitFailure = _this.handleSubmitFailure.bind(_this);
+    _this.onToggleDropDown = _this.onToggleDropDown.bind(_this);
     _this.state = {
       statuses: [],
+      renderedUsers: [],
+      renderedUsers1: [],
       searchValue: '',
       sortValue: null,
       from: undefined,
-      to: undefined
+      to: undefined,
+      activePage: 1,
+      itemsCountPerPage: 5
     };
     return _this;
   }
@@ -83,13 +94,9 @@ var Check_status = exports.Check_status = function (_React$Component) {
   }, {
     key: 'searchInputChange',
     value: function searchInputChange(event) {
-      var child = document.getElementById("myPager");
-
-      // $("#myPager").empty();
       this.searchValue = event.target.value.toLowerCase();
       this.setState({ searchValue: this.searchValue });
-
-      // this.handlePagination();
+      this.handlePageChange(1);
     }
   }, {
     key: 'clearFilters',
@@ -132,29 +139,41 @@ var Check_status = exports.Check_status = function (_React$Component) {
   }, {
     key: 'filterDateRange',
     value: function filterDateRange(from, to) {
-      var _this4 = this;
-
-      // $("#myPager").empty();
       if (from == undefined) {
         from = new Date("05/20/2018");
       }
-
       if (to == undefined) {
         to = new Date();
       }
 
       var currentLoggedinUsername = props.userName;
-      var query = "username=" + currentLoggedinUsername + "&startDate=" + from + "&endDate=" + to;
-      var url = "expenses?" + query;
+      var postData = {
+        "username": currentLoggedinUsername,
+        "startDate": from,
+        "endDate": to
+      };
 
-      fetch(url).then(function (res) {
-        return res.json();
-      }).then(function (res) {
-        _this4.setState({
-          statuses: res
-        });
+      $.ajax({
+        contentType: "application/json",
+        type: "GET",
+        url: "/expenses",
+        data: postData,
+        success: this.handleSubmitSuccess,
+        error: this.handleSubmitFailure
       });
-      // this.handlePagination();
+    }
+  }, {
+    key: 'handleSubmitSuccess',
+    value: function handleSubmitSuccess(data) {
+      this.setState({
+        statuses: data
+      });
+      this.handlePageChange(1);
+    }
+  }, {
+    key: 'handleSubmitFailure',
+    value: function handleSubmitFailure(error) {
+      console.log(error);
     }
   }, {
     key: 'componentWillMount',
@@ -162,141 +181,43 @@ var Check_status = exports.Check_status = function (_React$Component) {
       this.filterDateRange(undefined, undefined);
     }
   }, {
-    key: 'componentDidUpdate',
-    value: function componentDidUpdate() {}
-    // this.handlePagination();
-
-
-    // handlePagination() {
-    //   var that = this;
-    //   $.fn.pageMe = function (opts) {
-    //     var $this = this,
-    //       defaults = {
-    //         perPage: 5,
-    //         showPrevNext: false,
-    //         hidePageNumbers: false
-    //       },
-    //       settings = $.extend(defaults, opts);
-
-    //     var listElement = $this;
-    //     var perPage = settings.perPage;
-    //     var children = listElement.children();
-    //     var pager = $('.pager');
-    //     var currentChild = document.getElementById("myPager");
-
-
-    //     if (typeof settings.childSelector != "undefined") {
-    //       children = listElement.find(settings.childSelector);
-    //     }
-
-    //     if (typeof settings.pagerSelector != "undefined") {
-    //       pager = $(settings.pagerSelector);
-    //     }
-
-    //     var numItems = that.state.statuses.length;
-    //     var numPages = Math.ceil(numItems / perPage);
-
-    //     pager.data("curr", 0);
-
-    //     if (settings.showPrevNext) {
-    //       $('<li><a href="#" class="prev_link">«</a></li>').appendTo(pager);
-    //     }
-
-    //     var curr = 0;
-    //     while (numPages > curr && (settings.hidePageNumbers == false)) {
-    //       $('<li><a href="#" class="page_link">' + (curr + 1) + '</a></li>').appendTo(pager);
-    //       curr++;
-    //     }
-
-    //     if (settings.showPrevNext) {
-    //       $('<li><a href="#" class="next_link">»</a></li>').appendTo(pager);
-    //     }
-
-    //     pager.find('.page_link:first').addClass('active');
-    //     pager.find('.prev_link').hide();
-    //     if (numPages <= 1) {
-    //       pager.find('.next_link').hide();
-    //     }
-    //     pager.children().eq(1).addClass("active");
-
-    //     children.hide();
-    //     children.slice(0, perPage).show();
-
-    //     pager.find('li .page_link').click(function () {
-    //       var clickedPage = $(this).html().valueOf() - 1;
-    //       goTo(clickedPage, perPage);
-    //       return false;
-    //     });
-    //     pager.find('li .prev_link').click(function () {
-    //       previous();
-    //       return false;
-    //     });
-    //     pager.find('li .next_link').click(function () {
-    //       next();
-    //       return false;
-    //     });
-
-    //     function previous() {
-    //       var goToPage = parseInt(pager.data("curr")) - 1;
-    //       goTo(goToPage);
-    //     }
-
-    //     function next() {
-    //       goToPage = parseInt(pager.data("curr")) + 1;
-    //       goTo(goToPage);
-    //     }
-
-    //     function goTo(page) {
-    //       var startAt = page * perPage,
-    //         endOn = startAt + perPage;
-
-    //       children.css('display', 'none').slice(startAt, endOn).show();
-
-    //       if (page >= 1) {
-    //         pager.find('.prev_link').show();
-    //       }
-    //       else {
-    //         pager.find('.prev_link').hide();
-    //       }
-
-    //       if (page < (numPages - 1)) {
-    //         pager.find('.next_link').show();
-    //       }
-    //       else {
-    //         pager.find('.next_link').hide();
-    //       }
-
-    //       pager.data("curr", page);
-    //       pager.children().removeClass("active");
-    //       pager.children().eq(page + 1).addClass("active");
-
-    //     }
-    //   };
-
-    //   $(document).ready(function () {
-    //     $('#checkStatusTableBody').pageMe({ pagerSelector: '#myPager', showPrevNext: true, hidePageNumbers: false, perPage: 4 });
-    //   });
-    // }
-
+    key: 'handlePageChange',
+    value: function handlePageChange(pageNumber) {
+      var numberOfRecords = void 0;
+      if (document.getElementById("select") == null) {
+        numberOfRecords = 5;
+      } else {
+        numberOfRecords = Number(document.getElementById("select").value);
+      }
+      var renderedUsers1 = this.state.renderedUsers.slice((pageNumber - 1) * numberOfRecords, (pageNumber - 1) * numberOfRecords + numberOfRecords);
+      this.setState({ activePage: pageNumber, itemsCountPerPage: numberOfRecords, renderedUsers1: renderedUsers1 });
+    }
+  }, {
+    key: 'onToggleDropDown',
+    value: function onToggleDropDown() {
+      this.handlePageChange(1);
+    }
   }, {
     key: 'render',
     value: function render() {
-      var _this5 = this;
+      var _this4 = this;
 
       var currentLoggedinUsername = props.userName;
       var _state2 = this.state,
           from = _state2.from,
           to = _state2.to;
+      var renderedUsers1 = this.state.renderedUsers1;
 
       var modifiers = { start: from, end: to };
-      var sortedExpensesBySearch = this.state.statuses.filter(function (p) {
-        if (_this5.state.searchValue) {
-          return p.expenseName.toLowerCase().indexOf(_this5.state.searchValue) !== -1 || p.status.toLowerCase().indexOf(_this5.state.searchValue) !== -1;
+      var dateFormat = require('dateformat');
+
+      this.state.renderedUsers = this.state.statuses.filter(function (p) {
+        if (_this4.state.searchValue) {
+          return p.expenseName.toLowerCase().indexOf(_this4.state.searchValue) !== -1 || p.status.toLowerCase().indexOf(_this4.state.searchValue) !== -1;
         } else {
           return p;
         }
       });
-
       var tableBorderStyle = {
         border: '1.5px solid black'
       };
@@ -305,9 +226,23 @@ var Check_status = exports.Check_status = function (_React$Component) {
         backgroundColor: 'lightblue'
       };
 
-      var tableData;
+      var fromValue = void 0;
+      if (this.state.from == undefined) {
+        fromValue = new Date("05/20/2018");
+      } else {
+        fromValue = this.state.from;
+      }
 
-      if (sortedExpensesBySearch.length == 0) {
+      var toValue = void 0;
+      if (this.state.to == undefined) {
+        toValue = new Date();
+      } else {
+        toValue = this.state.to;
+      }
+
+      var tableData = void 0;
+
+      if (this.state.renderedUsers.length == 0) {
         tableData = _react2.default.createElement(
           'div',
           null,
@@ -321,87 +256,191 @@ var Check_status = exports.Check_status = function (_React$Component) {
         tableData = _react2.default.createElement(
           'div',
           null,
+          _react2.default.createElement('img', { src: 'http://egov.eletsonline.com/wp-content/uploads/2017/10/yash-technologies-pvt-ltd-m-g-road-indore-2de3l.jpg', alt: 'Yash Technologies', width: '150', height: '100', id: 'image-xls', style: { display: 'none' } }),
           _react2.default.createElement(
-            'div',
-            null,
+            'table',
+            { id: 'table-to-xls', style: { border: '1.5px solid black', width: '95%', display: 'none' }, className: 'table table-bordered' },
             _react2.default.createElement(
-              'table',
-              { id: 'table-to-xls', style: { border: '1.5px solid black', width: '95%' }, className: 'table table-bordered' },
+              'thead',
+              { style: tableHeaderStyle },
               _react2.default.createElement(
-                'thead',
-                { style: tableHeaderStyle },
+                'tr',
+                null,
                 _react2.default.createElement(
-                  'tr',
-                  null,
-                  _react2.default.createElement(
-                    'th',
-                    { style: tableBorderStyle, scope: 'col' },
-                    'Expense ID'
-                  ),
-                  _react2.default.createElement(
-                    'th',
-                    { style: tableBorderStyle, scope: 'col' },
-                    'Submission Date'
-                  ),
-                  _react2.default.createElement(
-                    'th',
-                    { style: tableBorderStyle, scope: 'col' },
-                    'Total Amount'
-                  ),
-                  _react2.default.createElement(
-                    'th',
-                    { style: tableBorderStyle, scope: 'col' },
-                    'Expense Name'
-                  ),
-                  _react2.default.createElement(
-                    'th',
-                    { style: tableBorderStyle, scope: 'col' },
-                    'Status'
-                  )
+                  'th',
+                  { style: tableBorderStyle, scope: 'col' },
+                  'Expense ID'
+                ),
+                _react2.default.createElement(
+                  'th',
+                  { style: tableBorderStyle, scope: 'col' },
+                  'Submission Date'
+                ),
+                _react2.default.createElement(
+                  'th',
+                  { style: tableBorderStyle, scope: 'col' },
+                  'Total Amount'
+                ),
+                _react2.default.createElement(
+                  'th',
+                  { style: tableBorderStyle, scope: 'col' },
+                  'Expense Name'
+                ),
+                _react2.default.createElement(
+                  'th',
+                  { style: tableBorderStyle, scope: 'col' },
+                  'Status'
                 )
-              ),
-              _react2.default.createElement(
-                'tbody',
-                { id: 'checkStatusTableBody' },
-                sortedExpensesBySearch.map(function (p) {
-                  return _react2.default.createElement(
-                    'tr',
-                    { scope: 'row' },
-                    _react2.default.createElement(
-                      'td',
-                      { style: tableBorderStyle },
-                      p.expenseID
-                    ),
-                    _react2.default.createElement(
-                      'td',
-                      { style: tableBorderStyle },
-                      p.creationDate
-                    ),
-                    _react2.default.createElement(
-                      'td',
-                      { style: tableBorderStyle },
-                      '$',
-                      p.amount
-                    ),
-                    _react2.default.createElement(
-                      'td',
-                      { style: tableBorderStyle },
-                      p.expenseName
-                    ),
-                    _react2.default.createElement(
-                      'td',
-                      { style: tableBorderStyle },
-                      p.status
-                    )
-                  );
-                })
               )
+            ),
+            _react2.default.createElement(
+              'tbody',
+              null,
+              this.state.renderedUsers.map(function (p) {
+                return _react2.default.createElement(
+                  'tr',
+                  { scope: 'row' },
+                  _react2.default.createElement(
+                    'td',
+                    { style: tableBorderStyle },
+                    p.expenseID
+                  ),
+                  _react2.default.createElement(
+                    'td',
+                    { style: tableBorderStyle },
+                    p.creationDate
+                  ),
+                  _react2.default.createElement(
+                    'td',
+                    { style: tableBorderStyle },
+                    '$',
+                    p.amount
+                  ),
+                  _react2.default.createElement(
+                    'td',
+                    { style: tableBorderStyle },
+                    p.expenseName
+                  ),
+                  _react2.default.createElement(
+                    'td',
+                    { style: tableBorderStyle },
+                    p.status
+                  )
+                );
+              })
+            )
+          ),
+          _react2.default.createElement(
+            'table',
+            { id: 'table-to-xls-1', style: { border: '1.5px solid black', width: '95%' }, className: 'table table-bordered' },
+            _react2.default.createElement(
+              'thead',
+              { style: tableHeaderStyle },
+              _react2.default.createElement(
+                'tr',
+                null,
+                _react2.default.createElement(
+                  'th',
+                  { style: tableBorderStyle, scope: 'col' },
+                  'Expense ID'
+                ),
+                _react2.default.createElement(
+                  'th',
+                  { style: tableBorderStyle, scope: 'col' },
+                  'Submission Date'
+                ),
+                _react2.default.createElement(
+                  'th',
+                  { style: tableBorderStyle, scope: 'col' },
+                  'Total Amount'
+                ),
+                _react2.default.createElement(
+                  'th',
+                  { style: tableBorderStyle, scope: 'col' },
+                  'Expense Name'
+                ),
+                _react2.default.createElement(
+                  'th',
+                  { style: tableBorderStyle, scope: 'col' },
+                  'Status'
+                )
+              )
+            ),
+            _react2.default.createElement(
+              'tbody',
+              null,
+              renderedUsers1.map(function (p) {
+                return _react2.default.createElement(
+                  'tr',
+                  { scope: 'row' },
+                  _react2.default.createElement(
+                    'td',
+                    { style: tableBorderStyle },
+                    p.expenseID
+                  ),
+                  _react2.default.createElement(
+                    'td',
+                    { style: tableBorderStyle },
+                    p.creationDate
+                  ),
+                  _react2.default.createElement(
+                    'td',
+                    { style: tableBorderStyle },
+                    '$',
+                    p.amount
+                  ),
+                  _react2.default.createElement(
+                    'td',
+                    { style: tableBorderStyle },
+                    p.expenseName
+                  ),
+                  _react2.default.createElement(
+                    'td',
+                    { style: tableBorderStyle },
+                    p.status
+                  )
+                );
+              })
             )
           ),
           _react2.default.createElement(
             'div',
-            { 'class': 'col-md-12 text-center' },
-            _react2.default.createElement('ul', { 'class': 'pagination pagination-lg pager', id: 'myPager' })
+            null,
+            _react2.default.createElement(
+              'select',
+              { style: { float: 'left', marginLeft: '1%', marginTop: '2%', width: '6%' }, id: 'select', name: 'group', className: 'form-control', size: '1', onChange: this.onToggleDropDown },
+              _react2.default.createElement(
+                'option',
+                { value: '5' },
+                '5'
+              ),
+              _react2.default.createElement(
+                'option',
+                { value: '10' },
+                '10'
+              ),
+              _react2.default.createElement(
+                'option',
+                { value: '25' },
+                '25'
+              )
+            ),
+            _react2.default.createElement(
+              'div',
+              { style: { float: 'right', marginRight: '5%', marginBottom: '10%' } },
+              _react2.default.createElement(_reactJsPagination2.default, {
+                hideDisabled: true,
+                prevPageText: 'prev',
+                nextPageText: 'next',
+                firstPageText: 'first',
+                lastPageText: 'last',
+                activePage: this.state.activePage,
+                itemsCountPerPage: this.state.itemsCountPerPage,
+                totalItemsCount: this.state.renderedUsers.length,
+                pageRangeDisplayed: 5,
+                onChange: this.handlePageChange
+              })
+            )
           )
         );
       }
@@ -434,7 +473,7 @@ var Check_status = exports.Check_status = function (_React$Component) {
               modifiers: modifiers,
               numberOfMonths: 2,
               onDayClick: function onDayClick() {
-                return _this5.to.getInput().focus();
+                return _this4.to.getInput().focus();
               }
             },
             onDayChange: this.handleFromChange
@@ -447,7 +486,7 @@ var Check_status = exports.Check_status = function (_React$Component) {
             { className: 'InputFromTo-to' },
             _react2.default.createElement(_DayPickerInput2.default, {
               ref: function ref(el) {
-                return _this5.to = el;
+                return _this4.to = el;
               },
               value: to,
               placeholder: ' To',
@@ -485,7 +524,7 @@ var Check_status = exports.Check_status = function (_React$Component) {
           _react2.default.createElement(
             'button',
             { type: 'submit', style: { marginLeft: '1%' }, className: 'btn btn-primary btn-sm', onClick: function onClick() {
-                return _this5.clearFilters();
+                return _this4.clearFilters();
               } },
             'Clear Filters'
           ),
@@ -498,8 +537,19 @@ var Check_status = exports.Check_status = function (_React$Component) {
               filename: "Expense Sheet - " + currentLoggedinUsername,
               sheet: 'Expense Sheet',
               buttonText: 'Download',
-              style: true })
+              img: 'image-xls',
+              dates: "Expense Report (" + dateFormat(fromValue, "mmm d, yyyy") + "-" + dateFormat(toValue, "mmm d, yyyy") + ")" })
           )
+        ),
+        _react2.default.createElement(
+          'div',
+          { className: 'alert alert-info', role: 'alert', style: { width: '40%' } },
+          _react2.default.createElement(
+            'strong',
+            null,
+            'Note: '
+          ),
+          'Clear all the filters to download entire history.'
         ),
         _react2.default.createElement(
           'div',

@@ -1,14 +1,10 @@
 package com.yash.ExpenseClaims.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.hibernate.engine.jdbc.BinaryStream;
 import org.springframework.context.annotation.Configuration;
-
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.io.InputStream;
 import java.io.Serializable;
-import java.sql.Blob;
 import java.util.Date;
 
 @Configuration
@@ -51,14 +47,6 @@ public class ExpenseDto implements Serializable {
 
     @JsonProperty("fileType")
     private String fileType;
-
-    public String getFileType() {
-        return fileType;
-    }
-
-    public void setFileType(String fileType) {
-        this.fileType = fileType;
-    }
 
     @JsonProperty("files")
     private transient byte[] files;
@@ -149,6 +137,14 @@ public class ExpenseDto implements Serializable {
 
     public void setFileID(int fileID) {
         this.fileID = fileID;
+    }
+
+    public String getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(String fileType) {
+        this.fileType = fileType;
     }
 
     public byte[] getFiles() {
