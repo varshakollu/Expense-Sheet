@@ -13,12 +13,6 @@ public class UserMapper {
         return new User(user.getUserName(), user.getPassword(), user.getEnabled(), true,true,true, new ArrayList<>());
     }
 
-    /*public static Collection<GrantedAuthority> getAuthorities(){
-        String ROLE_PREFIX = "ROLE_";
-        List<GrantedAuthority> list = new ArrayList<GrantedAuthority>();
-        list.add(new SimpleGrantedAuthority("ROLE_Admin"));
-        return list;
-    }*/
     public UserDto mapToDto(UserDetails userDetails) {
         UserDto userDto = new UserDto();
         userDto.setUserName(userDetails.getUsername());

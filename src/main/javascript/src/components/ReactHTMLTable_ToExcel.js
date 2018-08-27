@@ -8,6 +8,8 @@ const propTypes = {
   id: PropTypes.string,
   className: PropTypes.string,
   buttonText: PropTypes.string,
+  img : PropTypes.string.isRequired,
+  dates: PropTypes.string.isRequired,
 };
 
 const defaultProps = {
@@ -50,25 +52,29 @@ class ReactHTMLTable_ToExcel extends Component {
     const table = document.getElementById(this.props.table).outerHTML;
     const sheet = String(this.props.sheet);
     const filename = `${String(this.props.filename)}.xls`;
-
+    const img = document.getElementById(this.props.img).outerHTML;
+    const dates = String(this.props.dates);
     const uri = 'data:application/vnd.ms-excel;base64,';
+    debugger;
     const template =
       '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-mic' +
-      'rosoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta cha' +
+      'rosoft-com:office:excel" xmlns="https://www.w3.org/TR/html401"><head><meta cha' +
       'rset="UTF-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:Exce' +
       'lWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/>' +
       '</x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></' +
-      'xml><![endif]--></head><body>{table}</body></html>';
+      'xml><![endif]--></head><body><div>{img}<br><b>{dates}</b></div><div>{table}</div></body></html>';
 
     const context = {
       worksheet: sheet || 'Worksheet',
+      img,
+      dates,
       table,
     };
 
     // If IE11
     if (window.navigator.msSaveOrOpenBlob) {
       const fileData = [
-        `${'<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-mic' + 'rosoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta cha' + 'rset="UTF-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:Exce' + 'lWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/>' + '</x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></' + 'xml><![endif]--></head><body>'}${table}</body></html>`,
+        `${'<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-mic' + 'rosoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta cha' + 'rset="UTF-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:Exce' + 'lWorksheet><x:Name>'}${sheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/>' + '</x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></' + 'xml><![endif]--></head><body>'}<div>${img}<br><b>${dates}</b></div><div>${table}</div></body></html>`,
       ];
       const blobObject = new Blob(fileData);
       window.navigator.msSaveOrOpenBlob(blobObject, filename);
@@ -92,7 +98,7 @@ class ReactHTMLTable_ToExcel extends Component {
   render() {
     const buttonStyle = {
       color: '#fff',
-      backgroundColor : '#337ab7',
+      backgroundColor: '#337ab7',
       borderColor: '#2e6da4',
       display: 'inline-block',
       padding: '6px 12px',

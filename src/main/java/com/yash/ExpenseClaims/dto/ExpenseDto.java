@@ -1,11 +1,7 @@
 package com.yash.ExpenseClaims.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.multipart.MultipartFile;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
@@ -17,25 +13,43 @@ public class ExpenseDto implements Serializable {
     @JsonProperty("expenseID")
     private int expenseID;
 
-    @JsonProperty("creationDate")
-    private Date creationDate;
+    @JsonProperty("firstName")
+    private String firstName;
+
+    @JsonProperty("lastName")
+    private String lastName;
 
     @NotNull
-    @Size(min=2, max=30)
+    @Size(min = 2, max = 30)
     @JsonProperty("username")
     private String username;
 
-    @JsonProperty("amount")
-    private Double amount;
+    @JsonProperty("managerName")
+    private String managerName;
 
     @JsonProperty("expenseName")
     private String expenseName;
 
+    @JsonProperty("creationDate")
+    private Date creationDate;
+
+    @JsonProperty("amount")
+    private Double amount;
+
     @JsonProperty("status")
     private String status;
 
-    @JsonProperty("managerName")
-    private String managerName;
+    @JsonProperty("fileName")
+    private String fileName;
+
+    @JsonProperty("fileID")
+    private int fileID;
+
+    @JsonProperty("fileType")
+    private String fileType;
+
+    @JsonProperty("files")
+    private transient byte[] files;
 
     public int getExpenseID() {
         return expenseID;
@@ -43,6 +57,22 @@ public class ExpenseDto implements Serializable {
 
     public void setExpenseID(int expenseID) {
         this.expenseID = expenseID;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getUsername() {
@@ -53,12 +83,12 @@ public class ExpenseDto implements Serializable {
         this.username = username;
     }
 
-    public Double getAmount() {
-        return amount;
+    public String getManagerName() {
+        return managerName;
     }
 
-    public void setAmount(Double amount) {
-        this.amount = amount;
+    public void setManagerName(String managerName) {
+        this.managerName = managerName;
     }
 
     public String getExpenseName() {
@@ -69,14 +99,6 @@ public class ExpenseDto implements Serializable {
         this.expenseName = expenseName;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
     public Date getCreationDate() {
         return creationDate;
     }
@@ -85,11 +107,51 @@ public class ExpenseDto implements Serializable {
         this.creationDate = creationDate;
     }
 
-    public String getManagerName() {
-        return managerName;
+    public Double getAmount() {
+        return amount;
     }
 
-    public void setManagerName(String managerName) {
-        this.managerName = managerName;
+    public void setAmount(Double amount) {
+        this.amount = amount;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public int getFileID() {
+        return fileID;
+    }
+
+    public void setFileID(int fileID) {
+        this.fileID = fileID;
+    }
+
+    public String getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(String fileType) {
+        this.fileType = fileType;
+    }
+
+    public byte[] getFiles() {
+        return files;
+    }
+
+    public void setFiles(byte[] files) {
+        this.files = files;
     }
 }

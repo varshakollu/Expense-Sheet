@@ -10,7 +10,6 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.InputStream;
@@ -67,11 +66,12 @@ public class ExpensesRepository {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            String sql = "INSERT INTO ExpenseFiles (expenseID, fileName, file) values (:expenseID, :fileName, :file)";
+            String sql = "INSERT INTO ExpenseFiles (expenseID, fileName, file, fileType) values (:expenseID, :fileName, :file, :fileType)";
 
             Map<String, Object> parameterMap = new HashMap<>();
             parameterMap.put("expenseID", id);
             parameterMap.put("fileName", multipartFile[i].getOriginalFilename());
+            parameterMap.put("fileType",multipartFile[i].getContentType());
             parameterMap.put("file", inputStream);
 
             namedParameterJdbcTemplate.update(sql, parameterMap);
