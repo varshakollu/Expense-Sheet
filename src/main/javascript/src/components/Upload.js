@@ -19,13 +19,13 @@ export class Upload extends React.Component {
         this.state = {
             name: "",
             disableUpload: true,
+            disableSubmit: true,
             files: [],
             excelFileFound: false,
             countOfExcelFiles: 0,
             billsFound: false,
             countOfBills: 0
         };
-
         this.handleNameChange = this.handleNameChange.bind(this);
         this.handleAmountChange = this.handleAmountChange.bind(this);
         this.handleUploadFilesChange = this.handleUploadFilesChange.bind(this);
@@ -42,16 +42,19 @@ export class Upload extends React.Component {
     }
     handleNameChange(event) {
         if (event.target.value != "") {
-            this.setState({ name: event.target.value, disableUpload: false });
+            this.setState({ name: event.target.value, disableUpload: false, disableSubmit: false });
         }
         else {
-            this.setState({ disableUpload: true });
+            this.setState({ disableUpload: true, disableSubmit: true });
         }
     }
 
     handleAmountChange(event) {
         if (event.target.value != "") {
-            this.setState({ amount: event.target.value });
+            this.setState({ amount: event.target.value, disableUpload: false, disableSubmit: false });
+        }
+        else {
+            this.setState({ disableUpload: true, disableSubmit: true });
         }
     }
 
@@ -133,10 +136,11 @@ export class Upload extends React.Component {
     }
 
     validateNameAndAmount(name, amount) {
-        if (name != undefined && amount != undefined) {
+        if (name != undefined && name != "" && amount != undefined && amount != "") {
             return true;
         }
         else {
+            this.setState({ disableSubmit: true });
             alert("Complete all fields in the form");
         }
     }
@@ -175,7 +179,7 @@ export class Upload extends React.Component {
                 }
             }
 
-            // This will execute only one expense sheet is uploaded
+            // This will execute when only one expense sheet is uploaded
             else if (this.state.countOfExcelFiles == 1 && this.state.countOfBills < 1) {
                 // save the excel sheet in the state, request for bills
                 let confirmMessage = confirm("Please upload all appropriate bills.");
@@ -351,7 +355,7 @@ export class Upload extends React.Component {
                     </div>
                     <div className="form-row">
                         <div className="form-group col-lg-8">
-                            <button className="btn btn-primary" type="button" onClick={this.handleSubmit}>Submit my Expense report</button>
+                            <button className="btn btn-primary" type="button" disabled={this.state.disableSubmit} onClick={this.handleSubmit}>Submit my Expense report</button>
                             <button className="btn btn-link" type="reset" onClick={this.handleCancel}> Cancel </button>
                         </div>
                     </div>

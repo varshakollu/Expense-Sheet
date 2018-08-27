@@ -35,7 +35,7 @@ var Help = exports.Help = function (_React$Component) {
         value: function render() {
 
             var divStyle = (0, _glamor.css)({
-                marginLeft: '20%',
+                marginLeft: '17%',
                 marginRight: '5%',
                 textAlign: 'justify'
             });
@@ -47,6 +47,15 @@ var Help = exports.Help = function (_React$Component) {
             return _react2.default.createElement(
                 'div',
                 divStyle,
+                _react2.default.createElement(
+                    'h3',
+                    null,
+                    _react2.default.createElement(
+                        'a',
+                        { href: 'https://www.yash.com/onboard/Expense sheet template.xlsx' },
+                        'Click here to download Sample Expense Sheet'
+                    )
+                ),
                 _react2.default.createElement(
                     'h3',
                     null,

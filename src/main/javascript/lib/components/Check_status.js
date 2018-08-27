@@ -520,7 +520,7 @@ var Check_status = exports.Check_status = function (_React$Component) {
         _react2.default.createElement(
           'div',
           { style: { float: 'none', marginBottom: '2%' } },
-          _react2.default.createElement('input', { id: 'searchField', style: { width: '25%', display: 'inline-block' }, className: 'form-control', type: 'text', placeholder: 'Search Reason/Status', onChange: this.searchInputChange, 'aria-label': 'Search' }),
+          _react2.default.createElement('input', { id: 'searchField', style: { width: '25%', display: 'inline-block' }, className: 'form-control', type: 'text', placeholder: 'Search Expense Name/Status', onChange: this.searchInputChange, 'aria-label': 'Search' }),
           _react2.default.createElement(
             'button',
             { type: 'submit', style: { marginLeft: '1%' }, className: 'btn btn-primary btn-sm', onClick: function onClick() {

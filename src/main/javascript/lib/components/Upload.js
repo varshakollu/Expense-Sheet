@@ -46,6 +46,7 @@ var Upload = exports.Upload = function (_React$Component) {
         _this.state = {
             name: "",
             disableUpload: true,
+            disableSubmit: true,
             files: [],
             excelFileFound: false,
             countOfExcelFiles: 0,
@@ -73,16 +74,19 @@ var Upload = exports.Upload = function (_React$Component) {
         key: "handleNameChange",
         value: function handleNameChange(event) {
             if (event.target.value != "") {
-                this.setState({ name: event.target.value, disableUpload: false });
+                this.setState({ name: event.target.value, disableUpload: false, disableSubmit: false });
+                // this.setState({disableSubmit:true});
             } else {
-                this.setState({ disableUpload: true });
+                this.setState({ disableUpload: true, disableSubmit: true });
             }
         }
     }, {
         key: "handleAmountChange",
         value: function handleAmountChange(event) {
             if (event.target.value != "") {
-                this.setState({ amount: event.target.value });
+                this.setState({ amount: event.target.value, disableUpload: false, disableSubmit: false });
+            } else {
+                this.setState({ disableUpload: true, disableSubmit: true });
             }
         }
     }, {
@@ -175,9 +179,10 @@ var Upload = exports.Upload = function (_React$Component) {
     }, {
         key: "validateNameAndAmount",
         value: function validateNameAndAmount(name, amount) {
-            if (name != undefined && amount != undefined) {
+            if (name != undefined && name != "" && amount != undefined && amount != "") {
                 return true;
             } else {
+                this.setState({ disableSubmit: true });
                 alert("Complete all fields in the form");
             }
         }
@@ -216,7 +221,7 @@ var Upload = exports.Upload = function (_React$Component) {
                         }
                 }
 
-                // This will execute only one expense sheet is uploaded
+                // This will execute when only one expense sheet is uploaded
                 else if (this.state.countOfExcelFiles == 1 && this.state.countOfBills < 1) {
                         // save the excel sheet in the state, request for bills
                         var _confirmMessage2 = confirm("Please upload all appropriate bills.");
@@ -335,41 +340,40 @@ var Upload = exports.Upload = function (_React$Component) {
                 visible: "none"
             });
             var divStyle = (0, _glamor.css)({
-                marginLeft: '20%',
+                marginLeft: '17%',
                 marginRight: '5%',
                 textAlign: 'justify'
             });
-            var instructionStyle = (0, _glamor.css)({
-                padding: '2%'
-            });
+
             return _react2.default.createElement(
                 "div",
-                divStyle,
+                { style: { marginLeft: '17%' } },
+                _react2.default.createElement(
+                    "h3",
+                    { style: { marginBottom: '2%' } },
+                    "Upload Expenses"
+                ),
                 _react2.default.createElement(
                     "div",
-                    instructionStyle,
+                    { className: "alert alert-info", role: "alert", style: { width: '60%' } },
                     _react2.default.createElement(
-                        "h4",
+                        "strong",
                         null,
-                        "Please download the sample Expense sheet, fill it and upload it with an expense name. "
+                        "Note: "
                     ),
-                    _react2.default.createElement(
-                        "a",
-                        { href: "https://www.yash.com/onboard/Expense sheet template.xlsx" },
-                        "Click here to download Sample Expense Sheet"
-                    )
+                    "Review the help section before you submit expenses"
                 ),
                 _react2.default.createElement(_reactToasts.ToastContainer, { store: _reactToasts.ToastStore, position: _reactToasts.ToastContainer.POSITION.TOP_CENTER }),
                 _react2.default.createElement(
                     "form",
-                    { id: "myForm" },
+                    { id: "myForm", style: { marginLeft: '-1%' } },
                     _react2.default.createElement(
                         "div",
-                        { className: "form-group col-lg-6" },
+                        { className: "form-group col-lg-7" },
                         _react2.default.createElement(
                             "label",
                             null,
-                            "Enter the name for your expense"
+                            "Enter a name for your expense"
                         ),
                         _react2.default.createElement("input", { id: "NameControl",
                             className: "form-control",
@@ -380,7 +384,7 @@ var Upload = exports.Upload = function (_React$Component) {
                     ),
                     _react2.default.createElement(
                         "div",
-                        { className: "form-group col-lg-6" },
+                        { className: "form-group col-lg-7" },
                         _react2.default.createElement(
                             "label",
                             null,
@@ -401,7 +405,7 @@ var Upload = exports.Upload = function (_React$Component) {
                             _react2.default.createElement(
                                 "label",
                                 null,
-                                "Upload the Expense sheet along with the bills"
+                                "Upload Expense sheet along with appropriate bills"
                             ),
                             _react2.default.createElement("input", _extends({ type: "file"
                             }, hiddenFileControlStyle, {
@@ -441,7 +445,7 @@ var Upload = exports.Upload = function (_React$Component) {
                             { className: "form-group col-lg-8" },
                             _react2.default.createElement(
                                 "button",
-                                { className: "btn btn-primary", type: "button", onClick: this.handleSubmit },
+                                { className: "btn btn-primary", type: "button", disabled: this.state.disableSubmit, onClick: this.handleSubmit },
                                 "Submit my Expense report"
                             ),
                             _react2.default.createElement(
