@@ -324,7 +324,7 @@ export class Check_status extends React.Component {
           </Helmet>
         </div>
         <div style={{ float: 'none', marginBottom: '2%' }}>
-          <input id="searchField" style={{ width: '25%', display: 'inline-block' }} className="form-control" type="text" placeholder="Search Reason/Status" onChange={this.searchInputChange} aria-label="Search" />
+          <input id="searchField" style={{ width: '25%', display: 'inline-block' }} className="form-control" type="text" placeholder="Search Expense Name/Status" onChange={this.searchInputChange} aria-label="Search" />
           <button type="submit" style={{ marginLeft: '1%' }} className="btn btn-primary btn-sm" onClick={() => this.clearFilters()}>
             Clear Filters
           </button>

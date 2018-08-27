@@ -199,7 +199,7 @@ export class Upload extends React.Component {
                     formData.append("bills", files[i]);
                 }
                 let that = this;
-                
+
                 $.ajax({
                     url: "/expenses",
                     type: "POST",
@@ -287,24 +287,21 @@ export class Upload extends React.Component {
             visible: "none"
         });
         const divStyle = css({
-            marginLeft: '20%',
+            marginLeft: '17%',
             marginRight: '5%',
             textAlign: 'justify'
         });
-        const instructionStyle = css({
-            padding: '2%',
-        });
-        return (
-            <div {...divStyle}>
-                <div {...instructionStyle}>
-                    <h4>Please download the sample Expense sheet, fill it and upload it with an expense name. </h4>
-                    <a href="https://www.yash.com/onboard/Expense sheet template.xlsx">Click here to download Sample Expense Sheet</a>
-                </div>
 
+        return (
+            <div style={{ marginLeft: '17%' }}>
+                <h3 style={{ marginBottom: '2%' }} >Upload Expenses</h3>
+                <div className="alert alert-info" role="alert" style={{ width: '60%' }}>
+                    <strong>Note: </strong>Review the help section before you submit expenses
+                </div>
                 <ToastContainer store={ToastStore} position={ToastContainer.POSITION.TOP_CENTER} />
-                <form id="myForm">
-                    <div className="form-group col-lg-6">
-                        <label>Enter the name for your expense</label>
+                <form id="myForm" style={{ marginLeft: '-1%' }}>
+                    <div className="form-group col-lg-7">
+                        <label>Enter a name for your expense</label>
                         <input id="NameControl"
                             className="form-control"
                             type="text"
@@ -312,7 +309,7 @@ export class Upload extends React.Component {
                             onChange={this.handleNameChange}
                             required />
                     </div>
-                    <div className="form-group col-lg-6">
+                    <div className="form-group col-lg-7">
                         <label>Total amount spent</label>
                         <input id="AmountControl"
                             className="form-control"
@@ -323,7 +320,7 @@ export class Upload extends React.Component {
 
                     <div className="form-row">
                         <div className="form-group col-lg-8">
-                            <label>Upload the Expense sheet along with the bills</label>
+                            <label>Upload Expense sheet along with appropriate bills</label>
                             <input type="file"
                                 {...hiddenFileControlStyle}
                                 className="invisible"
