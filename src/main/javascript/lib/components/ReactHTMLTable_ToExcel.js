@@ -1,0 +1,153 @@
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _propTypes = require('prop-types');
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var propTypes = {
+  table: _propTypes2.default.string.isRequired,
+  filename: _propTypes2.default.string.isRequired,
+  sheet: _propTypes2.default.string.isRequired,
+  id: _propTypes2.default.string,
+  className: _propTypes2.default.string,
+  buttonText: _propTypes2.default.string,
+  img: _propTypes2.default.string.isRequired,
+  dates: _propTypes2.default.string.isRequired
+};
+
+var defaultProps = {
+  id: 'button-download-as-xls',
+  className: 'button-download',
+  buttonText: 'Download'
+};
+
+var ReactHTMLTable_ToExcel = function (_Component) {
+  _inherits(ReactHTMLTable_ToExcel, _Component);
+
+  function ReactHTMLTable_ToExcel(props) {
+    _classCallCheck(this, ReactHTMLTable_ToExcel);
+
+    var _this = _possibleConstructorReturn(this, (ReactHTMLTable_ToExcel.__proto__ || Object.getPrototypeOf(ReactHTMLTable_ToExcel)).call(this, props));
+
+    _this.handleDownload = _this.handleDownload.bind(_this);
+    return _this;
+  }
+
+  _createClass(ReactHTMLTable_ToExcel, [{
+    key: 'handleDownload',
+    value: function handleDownload() {
+      if (!document) {
+        if (process.env.NODE_ENV !== 'production') {
+          console.error('Failed to access document object');
+        }
+
+        return null;
+      }
+
+      if (document.getElementById(this.props.table).nodeType !== 1 || document.getElementById(this.props.table).nodeName !== 'TABLE') {
+        if (process.env.NODE_ENV !== 'production') {
+          console.error('Provided table property is not html table element');
+        }
+
+        return null;
+      }
+
+      var table = document.getElementById(this.props.table).outerHTML;
+      var sheet = String(this.props.sheet);
+      var filename = String(this.props.filename) + '.xls';
+      var img = document.getElementById(this.props.img).outerHTML;
+      var dates = String(this.props.dates);
+      var uri = 'data:application/vnd.ms-excel;base64,';
+      debugger;
+      var template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-mic' + 'rosoft-com:office:excel" xmlns="https://www.w3.org/TR/html401"><head><meta cha' + 'rset="UTF-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:Exce' + 'lWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/>' + '</x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></' + 'xml><![endif]--></head><body><div>{img}<br><b>{dates}</b></div><div>{table}</div></body></html>';
+
+      var context = {
+        worksheet: sheet || 'Worksheet',
+        img: img,
+        dates: dates,
+        table: table
+      };
+
+      // If IE11
+      if (window.navigator.msSaveOrOpenBlob) {
+        var fileData = ['' + ('<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-mic' + 'rosoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta cha' + 'rset="UTF-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:Exce' + 'lWorksheet><x:Name>') + sheet + '</x:Name><x:WorksheetOptions><x:DisplayGridlines/>\' + \'</x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></\' + \'xml><![endif]--></head><body>\'}<div>' + img + '<br><b>' + dates + '</b></div><div>' + table + '</div></body></html>'];
+        var blobObject = new Blob(fileData);
+        window.navigator.msSaveOrOpenBlob(blobObject, filename);
+        return true;
+      }
+
+      var element = window.document.createElement('a');
+      element.href = uri + ReactHTMLTable_ToExcel.base64(ReactHTMLTable_ToExcel.format(template, context));
+      element.download = filename;
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+
+      return true;
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var buttonStyle = {
+        color: '#fff',
+        backgroundColor: '#337ab7',
+        borderColor: '#2e6da4',
+        display: 'inline-block',
+        padding: '6px 12px',
+        fontSize: '13px',
+        fontWeight: '400',
+        lineHeight: '1.42857143',
+        border: '1px solid transparent',
+        borderRadius: '4px',
+        marginBottom: '10px'
+      };
+      return _react2.default.createElement(
+        'button',
+        { style: buttonStyle,
+          id: this.props.id,
+          className: this.props.className,
+          type: 'button',
+          onClick: this.handleDownload
+        },
+        this.props.buttonText
+      );
+    }
+  }], [{
+    key: 'base64',
+    value: function base64(s) {
+      return window.btoa(unescape(encodeURIComponent(s)));
+    }
+  }, {
+    key: 'format',
+    value: function format(s, c) {
+      return s.replace(/{(\w+)}/g, function (m, p) {
+        return c[p];
+      });
+    }
+  }]);
+
+  return ReactHTMLTable_ToExcel;
+}(_react.Component);
+
+ReactHTMLTable_ToExcel.propTypes = propTypes;
+ReactHTMLTable_ToExcel.defaultProps = defaultProps;
+
+exports.default = ReactHTMLTable_ToExcel;
