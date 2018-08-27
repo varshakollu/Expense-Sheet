@@ -5,7 +5,7 @@ export class Help extends React.Component {
     render() {
 
         const divStyle = css({
-            marginLeft: '20%',
+            marginLeft: '17%',
             marginRight: '5%',
             textAlign: 'justify'
         });
@@ -16,6 +16,7 @@ export class Help extends React.Component {
 
         return (
             <div {...divStyle}>
+                <h3><a href="https://www.yash.com/onboard/Expense sheet template.xlsx">Click here to download Sample Expense Sheet</a></h3>
                 <h3>GUIDELINES FOR APPROVED EXPENSES</h3>
                 <ol>
                     <li><p>Travel expense deductions are limited to those incurred which, considering all circumstances, are not lavish or extravagant.</p></li>
