@@ -1,10 +1,12 @@
 import React from "react";
 import { css } from "glamor";
-import { ToastContainer, ToastStore } from 'react-toasts';
+import Alert from 'react-s-alert';
+
 
 const initialState = {
     name: "",
     disableUpload: true,
+    disableSubmit: true,
     files: [],
     excelFileFound: false,
     countOfExcelFiles: 0,
@@ -146,6 +148,7 @@ export class Upload extends React.Component {
     }
 
     handleSubmit(event) {
+
         if (this.validateNameAndAmount(this.state.name, this.state.amount)) {
             let files = this.state.files;
             for (let i = 0; i < files.length; i++) {
@@ -190,7 +193,6 @@ export class Upload extends React.Component {
                 }
             }
             else if (this.state.countOfExcelFiles == 1 && this.state.countOfBills >= 1) {
-
 
                 let formData = new FormData();
                 formData.append("username", props.userName);
@@ -277,12 +279,16 @@ export class Upload extends React.Component {
     }
 
     handleSubmitSuccess(that) {
-        ToastStore.success("Your expense is succesfully uploaded", 5000);
+        Alert.success('Your expense is succesfully uploaded', {
+            position: 'top'
+        });
         that.handleCancel();
     }
 
     handleSubmitFailure(error) {
-        ToastStore.success("There is an error in form submission", 5000);
+        Alert.error('There is an error in form submission', {
+            position: 'top'
+        });
     }
 
     render() {
@@ -302,7 +308,7 @@ export class Upload extends React.Component {
                 <div className="alert alert-info" role="alert" style={{ width: '60%' }}>
                     <strong>Note: </strong>Review the help section before you submit expenses
                 </div>
-                <ToastContainer store={ToastStore} position={ToastContainer.POSITION.TOP_CENTER} />
+                <Alert stack={true} timeout={5000} />
                 <form id="myForm" style={{ marginLeft: '-1%' }}>
                     <div className="form-group col-lg-7">
                         <label>Enter a name for your expense</label>
@@ -348,7 +354,6 @@ export class Upload extends React.Component {
 
                             <div>
                                 <table id="uploadTable" border='0' style={{ width: '60%' }}>
-
                                 </table>
                             </div>
                         </div>

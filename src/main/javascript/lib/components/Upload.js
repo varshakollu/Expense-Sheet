@@ -15,7 +15,9 @@ var _react2 = _interopRequireDefault(_react);
 
 var _glamor = require("glamor");
 
-var _reactToasts = require("react-toasts");
+var _reactSAlert = require("react-s-alert");
+
+var _reactSAlert2 = _interopRequireDefault(_reactSAlert);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -28,6 +30,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var initialState = {
     name: "",
     disableUpload: true,
+    disableSubmit: true,
     files: [],
     excelFileFound: false,
     countOfExcelFiles: 0,
@@ -53,7 +56,6 @@ var Upload = exports.Upload = function (_React$Component) {
             billsFound: false,
             countOfBills: 0
         };
-
         _this.handleNameChange = _this.handleNameChange.bind(_this);
         _this.handleAmountChange = _this.handleAmountChange.bind(_this);
         _this.handleUploadFilesChange = _this.handleUploadFilesChange.bind(_this);
@@ -75,7 +77,6 @@ var Upload = exports.Upload = function (_React$Component) {
         value: function handleNameChange(event) {
             if (event.target.value != "") {
                 this.setState({ name: event.target.value, disableUpload: false, disableSubmit: false });
-                // this.setState({disableSubmit:true});
             } else {
                 this.setState({ disableUpload: true, disableSubmit: true });
             }
@@ -189,6 +190,7 @@ var Upload = exports.Upload = function (_React$Component) {
     }, {
         key: "handleSubmit",
         value: function handleSubmit(event) {
+
             if (this.validateNameAndAmount(this.state.name, this.state.amount)) {
                 var files = this.state.files;
                 for (var i = 0; i < files.length; i++) {
@@ -324,13 +326,17 @@ var Upload = exports.Upload = function (_React$Component) {
     }, {
         key: "handleSubmitSuccess",
         value: function handleSubmitSuccess(that) {
-            _reactToasts.ToastStore.success("Your expense is succesfully uploaded", 5000);
+            _reactSAlert2.default.success('Your expense is succesfully uploaded', {
+                position: 'top'
+            });
             that.handleCancel();
         }
     }, {
         key: "handleSubmitFailure",
         value: function handleSubmitFailure(error) {
-            _reactToasts.ToastStore.success("There is an error in form submission", 5000);
+            _reactSAlert2.default.error('There is an error in form submission', {
+                position: 'top'
+            });
         }
     }, {
         key: "render",
@@ -363,7 +369,7 @@ var Upload = exports.Upload = function (_React$Component) {
                     ),
                     "Review the help section before you submit expenses"
                 ),
-                _react2.default.createElement(_reactToasts.ToastContainer, { store: _reactToasts.ToastStore, position: _reactToasts.ToastContainer.POSITION.TOP_CENTER }),
+                _react2.default.createElement(_reactSAlert2.default, { stack: true, timeout: 5000 }),
                 _react2.default.createElement(
                     "form",
                     { id: "myForm", style: { marginLeft: '-1%' } },
