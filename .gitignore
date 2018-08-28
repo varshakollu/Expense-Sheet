@@ -1,11 +1,11 @@
 .gradle
-
 src/main/javascript/.vscode
 src/main/javascript/lib
 src/main/javascript/node_modules
 src/main/javascript/.eslintrc.json
 src/main/javascript/package-lock.json
 src/main/javascript/dist
+
 /build/
 
 !gradle/wrapper/gradle-wrapper.jar
