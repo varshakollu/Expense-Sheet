@@ -434,7 +434,7 @@ export class Approve_Expenses extends React.Component {
               <br />
               <p><strong>Expense name: </strong>{this.state.currentExpenseName}</p>
               <br />
-              <p><strong>Amount : </strong>{this.state.currentExpenseAmount}</p>
+              <p><strong>Amount : </strong>${this.state.currentExpenseAmount}</p>
               <br />
               <p><strong>Attachments : </strong></p>
               <form>
