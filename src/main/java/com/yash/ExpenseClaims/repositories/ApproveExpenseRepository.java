@@ -1,11 +1,14 @@
 package com.yash.ExpenseClaims.repositories;
 
 import com.yash.ExpenseClaims.dto.ExpenseDto;
+import com.yash.ExpenseClaims.services.EmailService;
 import com.yash.ExpenseClaims.utility.DateUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
+
 import javax.sql.DataSource;
 import java.sql.Blob;
 import java.sql.ResultSet;
@@ -24,11 +27,15 @@ public class ApproveExpenseRepository {
     @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
+    @Autowired
+    private EmailService emailService;
+
     public List<ExpenseDto> retrieveAllExpenses(String managername, Date startDate, Date endDate) {
 
         String sql = "select ExpenseInfo.expenseID, users.FirstName, users.LastName, ExpenseInfo.creationDate, " +
-                "ExpenseInfo.expenseName, ExpenseInfo.amount, ExpenseInfo.status " +
+                "ExpenseInfo.expenseName, ExpenseInfo.amount, expensestatus.statusInfo " +
                 "FROM ExpenseInfo INNER JOIN users ON ExpenseInfo.userName = users.username " +
+                "INNER JOIN expensestatus ON ExpenseInfo.statusID = expensestatus.statusID " +
                 "where ExpenseInfo.managerName = :managername and creationDate between :startDate and :endDate;";
 
         Map<String, Object> parameterMap = new HashMap<>();
@@ -46,7 +53,7 @@ public class ApproveExpenseRepository {
                 expenseDto.setCreationDate(rs.getDate(4));
                 expenseDto.setExpenseName(rs.getString(5));
                 expenseDto.setAmount(rs.getDouble(6));
-                expenseDto.setStatus(rs.getString(7));
+                expenseDto.setStatusInfo(rs.getString(7));
                 return expenseDto;
             }
         });
@@ -67,7 +74,7 @@ public class ApproveExpenseRepository {
                 expenseDto.setFileID(rs.getInt(1));
                 expenseDto.setFileType(rs.getString(2));
                 expenseDto.setFileName(rs.getString(3));
-            return expenseDto;
+                return expenseDto;
             }
         });
         return list;
@@ -89,5 +96,32 @@ public class ApproveExpenseRepository {
             }
         });
         return list;
+    }
+
+    public void changeExpenseStatus(ExpenseDto expenseDto) {
+
+        String UpdateSql = "UPDATE expenseinfo SET statusID = :statusID where expenseinfo.expenseID= :expenseID";
+
+        Map<String, Object> parameterMap = new HashMap<>();
+        parameterMap.put("statusID", expenseDto.getStatusID());
+        parameterMap.put("expenseID", expenseDto.getExpenseID());
+
+        namedParameterJdbcTemplate.update(UpdateSql, parameterMap);
+
+        String sql = "INSERT INTO comments (expenseID, username, commentedDate, comment) VALUES" +
+                "(:expenseID, :username, :commentedDate, :comment);";
+
+        Map<String, Object> parameterMap1 = new HashMap<>();
+        parameterMap1.put("expenseID", expenseDto.getExpenseID());
+        parameterMap1.put("username", expenseDto.getUsername());
+        parameterMap1.put("commentedDate", new Date());
+        parameterMap1.put("comment", expenseDto.getComment());
+
+        namedParameterJdbcTemplate.update(sql, parameterMap1);
+
+        if(expenseDto.getStatusID() == 110)
+        {
+            emailService.sendEmailToAccounting(expenseDto.getUsername(),expenseDto.getExpenseID());
+        }
     }
 }
