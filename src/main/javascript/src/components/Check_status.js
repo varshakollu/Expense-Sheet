@@ -7,6 +7,9 @@ import { formatDate, parseDate } from "react-day-picker/moment";
 import 'whatwg-fetch';
 import ReactHTMLTable_ToExcel from "./ReactHTMLTable_ToExcel";
 import Pagination from "react-js-pagination";
+import ReactModal from 'react-modal';
+import { css } from "glamor";
+import Alert from 'react-s-alert';
 
 export class Check_status extends React.Component {
 
@@ -22,8 +25,24 @@ export class Check_status extends React.Component {
     this.handleSubmitSuccess = this.handleSubmitSuccess.bind(this);
     this.handleSubmitFailure = this.handleSubmitFailure.bind(this);
     this.onToggleDropDown = this.onToggleDropDown.bind(this);
+    this.handleOpenModal = this.handleOpenModal.bind(this);
+    this.handleCloseModal = this.handleCloseModal.bind(this);
+    this.browseButtonClicked = this.browseButtonClicked.bind(this);
+    this.handleUploadFilesChange = this.handleUploadFilesChange.bind(this);
+    this.isPDFfile = this.isPDFfile.bind(this);
+    this.validateSize = this.validateSize.bind(this);
+    this.updateTableHTML = this.updateTableHTML.bind(this);
+    this.addRemoveButtonEvents = this.addRemoveButtonEvents.bind(this);
+    this.onCommentBoxChange = this.onCommentBoxChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleSubmitCommentSuccess = this.handleSubmitCommentSuccess.bind(this);
+    this.handleSubmitCommentFailure = this.handleSubmitCommentFailure.bind(this);
+
     this.state = {
       statuses: [],
+      files: [],
+      bills: [],
+      comments: [],
       renderedUsers: [],
       renderedUsers1: [],
       searchValue: '',
@@ -31,8 +50,86 @@ export class Check_status extends React.Component {
       from: undefined,
       to: undefined,
       activePage: 1,
-      itemsCountPerPage: 5
+      itemsCountPerPage: 5,
+      showModal: false,
+      currentExpenseID: 0,
+      currentExpenseFirstName: '',
+      currentExpenseLastName: '',
+      currentExpenseCreationDate: 0,
+      currentExpenseName: '',
+      currentExpenseAmount: 0,
+      currentStatus: '',
+      currentComment: '',
+      disableSubmit: true
     };
+  }
+
+  browseButtonClicked(event) {
+    document.getElementById('hiddenFileControl').click();
+  }
+  handleUploadFilesChange(event) {
+    let uploadedFilesList = event.target.files;
+    for (let i = 0; i < uploadedFilesList.length; i++) {
+      //not executable and size<2MB
+      if (this.isPDFfile(uploadedFilesList[i]) && this.validateSize(uploadedFilesList[i])) {
+        this.state.bills.push(uploadedFilesList[i]);
+      }
+    }
+    this.updateTableHTML(this.state.bills);
+  }
+
+  isPDFfile(file) {
+    if (file.type == "application/pdf") {
+      return true;
+    } else {
+      alert("Upload only pdf files");
+      return false;
+    }
+  }
+
+  validateSize(file) {
+    let fileSize = file.size / 1024 / 1024;
+    if (fileSize < 2) {
+      return true;
+    } else {
+      alert(file.name + " exceeds 2 MB size, please upload a file that is less than 2 MB");
+      return false;
+    }
+  }
+  updateTableHTML(updatedFiles) {
+    let table = document.getElementById("uploadTable");
+    table.innerHTML = "";
+    for (let i = 0; i < updatedFiles.length; ++i) {
+      let currentFile = updatedFiles[i];
+
+      let row = table.insertRow(i);
+      let cell1 = row.insertCell(0);
+      let cell2 = row.insertCell(1);
+
+      let buttonHTML = document.createElement("BUTTON");
+      let button_ID = currentFile.name + "_" + i;;
+      buttonHTML.setAttribute("id", button_ID);
+      buttonHTML.setAttribute("class", "btn btn-link");
+      buttonHTML.setAttribute("type", "button");
+      buttonHTML.appendChild(document.createTextNode("remove"));
+      cell1.innerText = currentFile.name
+      cell2.appendChild(buttonHTML)
+    }
+    this.addRemoveButtonEvents(this.state.bills);
+  }
+  addRemoveButtonEvents(updatedFiles) {
+    let that = this;
+    for (let id = 0; id < updatedFiles.length; id++) {
+      let button_ID = updatedFiles[id].name + "_" + id;
+      let button = document.getElementById(button_ID);
+      button.addEventListener("click", function (event) {
+        let button_ID = event.currentTarget.id;
+        let n = button_ID.lastIndexOf("_");
+        let index = button_ID.substring(n + 1);
+        that.state.bills.splice(index, 1);
+        that.updateTableHTML(that.state.bills);
+      });
+    }
   }
 
   showFromMonth() {
@@ -93,7 +190,7 @@ export class Check_status extends React.Component {
       "startDate": from,
       "endDate": to
     };
-    
+
     $.ajax({
       contentType: "application/json",
       type: "GET",
@@ -134,12 +231,128 @@ export class Check_status extends React.Component {
     this.handlePageChange(1);
   }
 
+  handleOpenModal(currentExpenseID, currentExpenseCreationDate, currentExpenseName, currentExpenseAmount, currentStatus) {
+    this.setState({
+      currentExpenseID: currentExpenseID,
+      currentExpenseCreationDate: currentExpenseCreationDate,
+      currentExpenseName: currentExpenseName,
+      currentExpenseAmount: currentExpenseAmount,
+      currentStatus: currentStatus
+    });
+
+    fetch("/approvals/" + currentExpenseID)
+      .then(res => res.json())
+      .then(res => {
+        this.setState({
+          files: res
+        });
+      });
+
+    fetch("/expenses/" + currentExpenseID + "/comments")
+      .then(res => res.json())
+      .then(res => {
+        this.setState({
+          comments: res
+        });
+      });
+
+    this.setState({ showModal: true });
+  }
+
+  handleCloseModal() {
+    this.setState({ showModal: false, disableSubmit: true });
+    while (this.state.bills.length > 0) {
+      this.state.bills.pop();
+    }
+  }
+
+  handleFileDisplay(fileID, fileName, fileType) {
+    fetch("/approvals/" + this.state.currentExpenseID + "/file/" + fileID)
+      .then(function (response) {
+        return response.blob();
+      })
+      .then(function (data) {
+        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+          window.navigator.msSaveOrOpenBlob(new Blob([data]), fileName);
+        } else {
+          var url = URL.createObjectURL(new Blob([data], {
+            type: fileType
+          }));
+          window.open(url, "_blank");
+        }
+      });
+  }
+
+  onCommentBoxChange(event) {
+    if (event.target.value != "") {
+      this.setState({ currentComment: event.target.value, disableSubmit: false });
+    }
+    else {
+      this.setState({ disableSubmit: true });
+    }
+  }
+
+  handleSubmit() {
+    if (this.state.currentComment != "") {
+      let formData = new FormData();
+      formData.append("expenseID", this.state.currentExpenseID);
+      formData.append("username", props.userName);
+      formData.append("comment", this.state.currentComment);
+
+      for (let i = 0; i < this.state.bills.length; i++) {
+        formData.append("bills", this.state.bills[i]);
+      }
+
+      $.ajax({
+        url: "/expenses/" + this.state.currentExpenseID + "/comments",
+        type: "POST",
+        encType: "multipart/form-data",
+        contentType: false,
+        processData: false,
+        data: formData,
+        success: this.handleSubmitCommentSuccess,
+        error: this.handleSubmitCommentFailure
+      });
+    }
+    else {
+      alert("Please enter some comments into the comments field");
+    }
+
+  }
+
+  handleSubmitCommentSuccess() {
+    Alert.success('Your comment is succesfully posted', {
+      position: 'top'
+    });
+    this.setState({ disableSubmit: true });
+    while (this.state.bills.length > 0) {
+      this.state.bills.pop();
+    }
+    this.handleCloseModal();
+  }
+
+  handleSubmitCommentFailure() {
+    Alert.error('There is an error in form submission', {
+      position: 'top'
+    });
+    this.setState({ disableSubmit: true });
+    while (this.state.bills.length > 0) {
+      this.state.bills.pop();
+    }
+    this.handleCloseModal();
+  }
+
   render() {
     const currentLoggedinUsername = props.userName;
     const { from, to } = this.state;
     const { renderedUsers1 } = this.state;
     const modifiers = { start: from, end: to };
     const dateFormat = require('dateformat');
+    const hiddenFileControlStyle = css({
+      visible: "none"
+    });
+
+    let isSubmittedOrPending = (this.state.currentStatus == "Pending" || this.state.currentStatus == "Submitted");
 
     this.state.renderedUsers = this.state.statuses.filter(
       (p) => {
@@ -217,7 +430,12 @@ export class Check_status extends React.Component {
           <tbody>
             {renderedUsers1.map((p) => (
               <tr scope="row">
-                <td style={tableBorderStyle}>{p.expenseID}</td>
+                <td style={tableBorderStyle}>
+                  <button
+                    className="btn btn-link"
+                    onClick={() => { this.handleOpenModal(p.expenseID, p.creationDate, p.expenseName, p.amount, p.status) }}>
+                    <strong>{p.expenseID}</strong></button>
+                </td>
                 <td style={tableBorderStyle}>{p.creationDate}</td>
                 <td style={tableBorderStyle}>${p.amount}</td>
                 <td style={tableBorderStyle}>{p.expenseName}</td>
@@ -252,6 +470,7 @@ export class Check_status extends React.Component {
 
     return (
       <div style={{ marginLeft: '17%' }}>
+        <Alert stack={true} timeout={5000} />
         <h3 style={{ marginBottom: '2%' }} >Expense Status</h3>
         <div className="InputFromTo" style={{ marginBottom: '2%' }}>
           <DayPickerInput
@@ -344,6 +563,82 @@ export class Check_status extends React.Component {
         </div>
         <div>
           {tableData}
+        </div>
+        <div>
+          <ReactModal
+            isOpen={this.state.showModal}
+            onRequestClose={this.handleCloseModal}
+          >
+            <div>
+              <h4><strong>Expense information for ID : </strong>{this.state.currentExpenseID}</h4>
+              <p><strong>Submission date : </strong>{this.state.currentExpenseCreationDate}</p>
+              <p><strong>Expense name: </strong>{this.state.currentExpenseName}</p>
+              <p><strong>Amount : </strong>{this.state.currentExpenseAmount}</p>
+              <p><strong>Status : </strong>{this.state.currentStatus}</p>
+              <p><strong>Attachments : </strong></p>
+              <ul className="form-group col-lg-12" style={{ float: 'unset', paddingLeft: "5%" }}>
+                {this.state.files.map((p) =>
+                  <li>
+                    <button className="btn btn-link" type="button"
+                      onClick={() => { this.handleFileDisplay(p.fileID, p.fileName, p.fileType) }}>
+                      {p.fileName}
+                    </button>
+                  </li>
+                )}
+              </ul>
+
+              <p><strong>Comments : </strong></p>
+              {this.state.comments.length > 0 ? (
+                <div class="panel-group">
+                  {this.state.comments.map((c) =>
+                    <div class="panel panel-info" style={{ width: "75%" }}>
+                      <div class="panel-heading">{c.username}<p style={{ float: 'right', color: '#999', fontSize: "smaller" }}>{c.commentedDate}</p></div>
+                      <div class="panel-body">{c.comment}</div>
+                    </div>
+                  )}
+                </div>
+              ) : <div><p>No Comments</p></div>
+              }
+
+              <br />
+              <form>
+                {isSubmittedOrPending ? (
+                  <div>
+                    <div className="form-group col-lg-8">
+                      <input type="file"
+                        {...hiddenFileControlStyle}
+                        className="invisible"
+                        id="hiddenFileControl"
+                        onChange={this.handleUploadFilesChange}
+                        multiple
+                        required />
+                      <input id="FileControl"
+                        className="form-control-file"
+                        type="button"
+                        value="Browse files"
+                        onClick={this.browseButtonClicked}
+                      />
+                    </div>
+                    <div className="form-group col-lg-8">
+                      <table id="uploadTable" border='0' style={{ width: '60%' }}></table>
+                      <br />
+                      <label>Comment:</label>
+                      <textarea className="form-control" rows="5" id="commentBox" onChange={this.onCommentBoxChange}></textarea>
+                      <br />
+                      <button className="btn btn-primary"
+                        type="button"
+                        disabled={this.state.disableSubmit}
+                        onClick={() => { this.handleSubmit() }}>Submit</button>
+                      <button className="btn btn-link" type="button" onClick={this.handleCloseModal}>Close</button>
+                    </div>
+                  </div>)
+                  : (<div>
+                    <button className="btn btn-link" type="button" onClick={this.handleCloseModal}>Close</button>
+                  </div>)
+                }
+              </form>
+            </div>
+          </ReactModal>
         </div>
       </div>
     );

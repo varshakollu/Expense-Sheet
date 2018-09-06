@@ -1,5 +1,6 @@
 package com.yash.ExpenseClaims.repositories;
 
+import com.yash.ExpenseClaims.dto.CommentDto;
 import com.yash.ExpenseClaims.dto.ExpenseDto;
 import com.yash.ExpenseClaims.utility.DateUtility;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.InputStream;
@@ -71,7 +73,7 @@ public class ExpensesRepository {
             Map<String, Object> parameterMap = new HashMap<>();
             parameterMap.put("expenseID", id);
             parameterMap.put("fileName", multipartFile[i].getOriginalFilename());
-            parameterMap.put("fileType",multipartFile[i].getContentType());
+            parameterMap.put("fileType", multipartFile[i].getContentType());
             parameterMap.put("file", inputStream);
 
             namedParameterJdbcTemplate.update(sql, parameterMap);
@@ -101,5 +103,42 @@ public class ExpensesRepository {
             }
         });
         return list;
+    }
+
+    public List<CommentDto> retrieveAllComments(int expenseID) {
+        String sql = "select commentID, expenseID, username, commentedDate, comment from Comments " +
+                "where expenseID = :expenseID;";
+
+        Map<String, Object> parameterMap = new HashMap<>();
+        parameterMap.put("expenseID", expenseID);
+
+        List<CommentDto> list = namedParameterJdbcTemplate.query(sql, parameterMap, new RowMapper<CommentDto>() {
+            @Override
+            public CommentDto mapRow(ResultSet rs, int i) throws SQLException {
+                CommentDto commentDto = new CommentDto();
+                commentDto.setCommentID(rs.getInt(1));
+                commentDto.setExpenseID(rs.getInt(2));
+                commentDto.setUsername(rs.getString(3));
+                commentDto.setCommentedDate(rs.getDate(4));
+                commentDto.setComment(rs.getString(5));
+
+                return commentDto;
+            }
+        });
+        return list;
+    }
+
+    public void postAnEmployeeComment(int expenseID, String username, String comment, MultipartFile[] multipartFiles) {
+        String sql = "INSERT INTO Comments (expenseID, username, commentedDate, comment) VALUES" +
+                "(:expenseID, :username, :commentedDate, :comment);";
+
+        MapSqlParameterSource parameters = new MapSqlParameterSource()
+                .addValue("expenseID", expenseID)
+                .addValue("username", username)
+                .addValue("commentedDate", new Date())
+                .addValue("comment", comment);
+
+        namedParameterJdbcTemplate.update(sql, parameters);
+        saveExpensesBills(expenseID,multipartFiles);
     }
 }

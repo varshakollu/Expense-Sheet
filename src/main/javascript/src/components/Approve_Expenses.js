@@ -28,6 +28,7 @@ export class Approve_Expenses extends React.Component {
     this.state = {
       statuses: [],
       files: [],
+      comments: [],
       renderedUsers: [],
       renderedUsers1: [],
       searchValue: '',
@@ -106,7 +107,7 @@ export class Approve_Expenses extends React.Component {
       "startDate": from,
       "endDate": to
     };
-  
+
     $.ajax({
       contentType: "application/json",
       type: "GET",
@@ -165,6 +166,15 @@ export class Approve_Expenses extends React.Component {
           files: res
         });
       });
+
+    fetch("/expenses/" + currentExpenseID + "/comments")
+      .then(res => res.json())
+      .then(res => {
+        this.setState({
+          comments: res
+        });
+      });
+
     this.setState({ showModal: true });
   }
 
@@ -179,7 +189,6 @@ export class Approve_Expenses extends React.Component {
         return response.blob();
       })
       .then(function (data) {
-        debugger;
         if (window.navigator && window.navigator.msSaveOrOpenBlob) {
           window.navigator.msSaveOrOpenBlob(new Blob([data]), fileName);
         } else {
@@ -425,30 +434,36 @@ export class Approve_Expenses extends React.Component {
           >
             <div>
               <h4><strong>Expense information for ID : </strong>{this.state.currentExpenseID}</h4>
-              <br />
               <p><strong>First name : </strong> {this.state.currentExpenseFirstName}</p>
-              <br />
               <p><strong>Last name : </strong>{this.state.currentExpenseLastName}</p>
-              <br />
               <p><strong>Submission date : </strong>{this.state.currentExpenseCreationDate}</p>
-              <br />
               <p><strong>Expense name: </strong>{this.state.currentExpenseName}</p>
-              <br />
               <p><strong>Amount : </strong>{this.state.currentExpenseAmount}</p>
-              <br />
               <p><strong>Attachments : </strong></p>
-              <form>
+              <ul className="form-group col-lg-12" style={{ float: 'unset', paddingLeft: "5%" }}>
                 {this.state.files.map((p) =>
-                  <ul className="form-group col-lg-8">
-                    <li>
-                      <button className="btn btn-link" type="button"
-                         onClick={() => { this.handleFileDisplay(p.fileID, p.fileName, p.fileType) }}>
-                        {p.fileName}
-                      </button>
-                    </li>
-                  </ul>
+                  <li>
+                    <button className="btn btn-link" type="button"
+                      onClick={() => { this.handleFileDisplay(p.fileID, p.fileName, p.fileType) }}>
+                      {p.fileName}
+                    </button>
+                  </li>
                 )}
-                <br />
+              </ul>
+              <p><strong>Comments : </strong></p>
+              {this.state.comments.length > 0 ? (
+                <div class="panel-group">
+                  {this.state.comments.map((c) =>
+                    <div class="panel panel-info" style={{ width: "75%" }}>
+                      <div class="panel-heading">{c.username}<p style={{ float: 'right', color: '#999', fontSize: "smaller" }}>{c.commentedDate}</p></div>
+                      <div class="panel-body">{c.comment}</div>
+                    </div>
+                  )}
+                </div>
+              ) : <div><p>No Comments</p></div>
+              }
+              <br />
+              <form>
                 <div className="form-group col-lg-8">
                   <label>Comment:</label>
                   <textarea className="form-control" rows="5" id="comment"></textarea>
@@ -456,11 +471,10 @@ export class Approve_Expenses extends React.Component {
                   <div className="alert alert-info" role="alert">
                     <strong>Heads up!</strong> Review all the expense information and attachments before approving this expense.
                     You cannot revert once it is approved.
-                  </div>
+                    </div>
                   <br />
                   <button className="btn btn-primary" type="button" onClick={this.handleCloseModal}>Approve</button>
                   <button className="btn btn-link" type="button" onClick={this.handleCloseModal}>Close</button>
-
                 </div>
               </form>
             </div>

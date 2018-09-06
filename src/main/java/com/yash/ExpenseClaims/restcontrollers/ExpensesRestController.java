@@ -1,5 +1,6 @@
 package com.yash.ExpenseClaims.restcontrollers;
 
+import com.yash.ExpenseClaims.dto.CommentDto;
 import com.yash.ExpenseClaims.dto.ExpenseDto;
 import com.yash.ExpenseClaims.repositories.ExpensesRepository;
 import com.yash.ExpenseClaims.services.EmailService;
@@ -37,4 +38,18 @@ public class ExpensesRestController {
                                                      @RequestParam("endDate") Date endDate) {
         return expensesRepository.retrieveAllExpenses(username, startDate, endDate);
     }
+
+    @RequestMapping(value = "/expenses/{expenseID}/comments", method = GET)
+    public List<CommentDto> retrieveAllCommentsForExpenseID(@PathVariable("expenseID") int expenseID) {
+        return  expensesRepository.retrieveAllComments(expenseID);
+    }
+
+    @RequestMapping(value = "/expenses/{expenseID}/comments", method = POST)
+    public void postAnEmployeeComment(@PathVariable("expenseID") int expenseID,
+                                                  @RequestParam("username") String username,
+                                                  @RequestParam("comment") String comment,
+                                                  @RequestPart("bills") MultipartFile[] multipartFiles) {
+        expensesRepository.postAnEmployeeComment(expenseID,username,comment,multipartFiles);
+    }
+
 }
