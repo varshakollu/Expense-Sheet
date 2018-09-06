@@ -31,7 +31,7 @@ public class ExpensesRepository {
     @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    public void saveAllExpenses(String username, Date creationDate, String expenseName, Double amount, String status, MultipartFile[] multipartFile) {
+    public void saveAllExpenses(String username, Date creationDate, String expenseName, Double amount, MultipartFile[] multipartFile) {
 
         String SelectSql = "SELECT ManagerName from users where username= :userName";
 
@@ -42,15 +42,15 @@ public class ExpensesRepository {
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        String sql = "INSERT INTO ExpenseInfo (userName, creationDate, expenseName, amount, status, managerName) VALUES" +
-                "(:userName, :creationDate, :expenseName, :amount, :status, :managerName);";
+        String sql = "INSERT INTO ExpenseInfo (userName, creationDate, expenseName, amount, statusID, managerName) VALUES" +
+                "(:userName, :creationDate, :expenseName, :amount, :statusid, :managerName);";
 
         MapSqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue("userName", username)
                 .addValue("creationDate", DateUtility.getFormattedDate(creationDate, "yyyy-MM-dd"))
                 .addValue("expenseName", expenseName)
                 .addValue("amount", amount)
-                .addValue("status", status)
+                .addValue("statusid", 100)
                 .addValue("managerName", managername);
 
         namedParameterJdbcTemplate.update(sql, parameters, keyHolder, new String[]{"expenseID"});
@@ -82,8 +82,9 @@ public class ExpensesRepository {
 
     public List<ExpenseDto> retrieveAllExpenses(String userName, Date startDate, Date endDate) {
 
-        String sql = "select expenseID, creationDate, amount, expenseName, status from ExpenseInfo " +
-                "where userName = :userName and creationDate between :startDate and :endDate;";
+        String sql = "select ExpenseInfo.expenseID, ExpenseInfo.creationDate, ExpenseInfo.amount, ExpenseInfo.expenseName, expensestatus.statusInfo from ExpenseInfo " +
+                "inner join expensestatus on ExpenseInfo.statusID = expensestatus.statusID " +
+                "where ExpenseInfo.userName = :userName and ExpenseInfo.creationDate between :startDate and :endDate;";
 
         Map<String, Object> parameterMap = new HashMap<>();
         parameterMap.put("userName", userName);
@@ -98,7 +99,7 @@ public class ExpensesRepository {
                 expenseDto.setCreationDate(rs.getDate(2));
                 expenseDto.setAmount(rs.getDouble(3));
                 expenseDto.setExpenseName(rs.getString(4));
-                expenseDto.setStatus(rs.getString(5));
+                expenseDto.setStatusInfo(rs.getString(5));
                 return expenseDto;
             }
         });

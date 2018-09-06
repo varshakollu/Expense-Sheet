@@ -192,13 +192,11 @@ export class Upload extends React.Component {
             }
             else if (this.state.countOfExcelFiles == 1 && this.state.countOfBills >= 1) {
 
-
                 let formData = new FormData();
                 formData.append("username", props.userName);
                 formData.append("creationDate", new Date());
                 formData.append("expenseName", this.state.name);
                 formData.append("amount", this.state.amount);
-                formData.append("status", "Submitted");
 
                 for (let i = 0; i < files.length; i++) {
                     formData.append("bills", files[i]);
@@ -230,6 +228,7 @@ export class Upload extends React.Component {
             files: tempArray
         });
     }
+
     removeExcelFilesAndSaveBills(confirmMessage) {
         let tempExpenseName = this.state.name;
         this.setState(initialState);
@@ -257,6 +256,7 @@ export class Upload extends React.Component {
         this.updateTableHTML(tempArray);
         this.setState({ files: tempArray });
     }
+
     saveExcelFileAndRequestForBills(confirmMessage) {
         let tempExpenseName = this.state.name;
         let tempArray = this.state.files;
@@ -288,18 +288,12 @@ export class Upload extends React.Component {
         Alert.error('There is an error in form submission', {
             position: 'top'
         });
-
     }
 
     render() {
 
         const hiddenFileControlStyle = css({
             visible: "none"
-        });
-        const divStyle = css({
-            marginLeft: '17%',
-            marginRight: '5%',
-            textAlign: 'justify'
         });
 
         return (
@@ -351,8 +345,11 @@ export class Upload extends React.Component {
                     </div>
                     <div className="form-row">
                         <div className="form-group col-lg-8">
+
                             <div>
-                                <table id="uploadTable" border='0' style={{ width: '60%' }}></table>
+                                <table id="uploadTable" border='0' style={{ width: '60%' }}>
+
+                                </table>
                             </div>
                         </div>
                     </div>

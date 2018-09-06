@@ -50,4 +50,35 @@ public class EmailService {
             e.printStackTrace();
         }
     }
+
+    public void sendEmailToAccounting(String managerName, int expenseID) {
+
+        Map<String, Object> map = emailRepository.getExpenseInfo(expenseID);
+        try {
+            MimeMessage message = sender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message);
+
+            helper.setTo("varshakollu@gmail.com"); //replace by ap_yash@yash.com
+            helper.setSubject((String) map.get("expenseName"));
+
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("<html><body>\n" +
+                    "\n" +
+                    "<p>Hello Accounting team, " + "</p>\n" +
+                    "\n" +
+                    "\n" +
+                    "<p>" + map.get("e_firstname") + " " + map.get("e_lastname") + " has uploaded an expense for an amount of $" + map.get("amount") + " and has been approved by " + map.get("m_firstname") + " " + map.get("m_lastname") + "</p>\n" +
+                    "\n" +
+                    "\n" +
+                    "<p> To review and approve this expense, <a href=\"http://localhost:8080\">Click here</a></p>" +
+                    "</body>\n" +
+                    "</html>");
+            helper.setText(stringBuilder.toString(), true);
+
+            sender.send(message);
+
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
 }

@@ -25,6 +25,12 @@ export class Approve_Expenses extends React.Component {
     this.onToggleDropDown = this.onToggleDropDown.bind(this);
     this.handleOpenModal = this.handleOpenModal.bind(this);
     this.handleCloseModal = this.handleCloseModal.bind(this);
+    this.afterOpenModal = this.afterOpenModal.bind(this);
+    this.handleApproveModal = this.handleApproveModal.bind(this);
+    this.handleDeclineModal = this.handleDeclineModal.bind(this);
+    this.handleAddressCommentModal = this.handleAddressCommentModal.bind(this);
+    this.handleStatusChangeInDB = this.handleStatusChangeInDB.bind(this);
+    this.handleSubmitSuccessExpense = this.handleSubmitSuccessExpense.bind(this);
     this.state = {
       statuses: [],
       files: [],
@@ -43,7 +49,8 @@ export class Approve_Expenses extends React.Component {
       currentExpenseLastName: '',
       currentExpenseCreationDate: 0,
       currentExpenseName: '',
-      currentExpenseAmount: 0
+      currentExpenseAmount: 0,
+      currentStatus: ''
     };
   }
 
@@ -107,7 +114,7 @@ export class Approve_Expenses extends React.Component {
       "startDate": from,
       "endDate": to
     };
-
+  
     $.ajax({
       contentType: "application/json",
       type: "GET",
@@ -127,6 +134,7 @@ export class Approve_Expenses extends React.Component {
 
   handleSubmitFailure(error) {
     console.log(error);
+    this.setState({ showModal: false });
   }
 
   componentWillMount() {
@@ -149,14 +157,15 @@ export class Approve_Expenses extends React.Component {
     this.handlePageChange(1);
   }
 
-  handleOpenModal(currentExpenseID, currentExpenseFirstName, currentExpenseLastName, currentExpenseCreationDate, currentExpenseName, currentExpenseAmount) {
+  handleOpenModal(currentExpenseID, currentExpenseFirstName, currentExpenseLastName, currentExpenseCreationDate, currentExpenseName, currentExpenseAmount, currentStatusInfo) {
     this.setState({
       currentExpenseID: currentExpenseID,
       currentExpenseFirstName: currentExpenseFirstName,
       currentExpenseLastName: currentExpenseLastName,
       currentExpenseCreationDate: currentExpenseCreationDate,
       currentExpenseName: currentExpenseName,
-      currentExpenseAmount: currentExpenseAmount
+      currentExpenseAmount: currentExpenseAmount,
+      currentStatusInfo: currentStatusInfo
     });
 
     fetch("/approvals/" + currentExpenseID)
@@ -182,6 +191,61 @@ export class Approve_Expenses extends React.Component {
     this.setState({ showModal: false });
   }
 
+  afterOpenModal() {
+    if (this.state.currentStatusInfo == "Sent to Accounting" || this.state.currentStatusInfo == "Declined") {
+      document.getElementById("approve").style.display = "none";
+      document.getElementById("decline").style.display = "none";
+      document.getElementById("review").style.display = "none";
+      document.getElementById("comment").style.display = "none";
+      document.getElementById("commentLabel").style.display = "none";
+      document.getElementById("note").style.display = "none";
+    }
+  }
+
+  handleStatusChangeInDB(upatedstatus) {
+    const statusID = upatedstatus;
+    if (document.getElementById("comment").value == "") {
+      alert("Please enter comments");
+    }
+    else {
+      const currentLoggedinUsername = props.userName;
+      const comments = document.getElementById("comment").value;
+      const postData = {
+        "expenseID": this.state.currentExpenseID,
+        "username": currentLoggedinUsername,
+        "comment": comments,
+        "statusID": statusID
+      };
+       $.ajax({
+        type: "POST",
+        url: "/expense/" + this.state.currentExpenseID + "/status",
+        data: JSON.stringify(postData),
+        contentType: "application/json",
+        success: this.handleSubmitSuccessExpense,
+        error: this.handleSubmitFailure,
+      });
+      this.handleCloseModal();
+      
+    }
+  }
+
+  handleSubmitSuccessExpense() {
+    console.log("success");
+    window.location.reload(true);
+  }
+
+  handleApproveModal() {
+    this.handleStatusChangeInDB(110);
+  }
+
+  handleDeclineModal() {
+    this.handleStatusChangeInDB(120);
+  }
+
+  handleAddressCommentModal() {
+    this.handleStatusChangeInDB(130);
+  }
+
   handleFileDisplay(fileID, fileName, fileType) {
 
     fetch("/approvals/" + this.state.currentExpenseID + "/file/" + fileID)
@@ -197,8 +261,6 @@ export class Approve_Expenses extends React.Component {
           }));
           window.open(url, "_blank");
         }
-
-
       });
   }
 
@@ -272,7 +334,7 @@ export class Approve_Expenses extends React.Component {
                 <td style={tableBorderStyle}>{p.creationDate}</td>
                 <td style={tableBorderStyle}>{p.expenseName}</td>
                 <td style={tableBorderStyle}>${p.amount}</td>
-                <td style={tableBorderStyle}>{p.status}</td>
+                <td style={tableBorderStyle}>{p.statusInfo}</td>
               </tr>
             ))}
           </tbody>
@@ -295,7 +357,7 @@ export class Approve_Expenses extends React.Component {
                 <td style={tableBorderStyle}>
                   <button
                     className="btn btn-link"
-                    onClick={() => { this.handleOpenModal(p.expenseID, p.firstName, p.lastName, p.creationDate, p.expenseName, p.amount) }}>
+                    onClick={() => { this.handleOpenModal(p.expenseID, p.firstName, p.lastName, p.creationDate, p.expenseName, p.amount, p.statusInfo) }}>
                     <strong>{p.expenseID}</strong></button>
                 </td>
                 <td style={tableBorderStyle}>{p.firstName}</td>
@@ -303,7 +365,7 @@ export class Approve_Expenses extends React.Component {
                 <td style={tableBorderStyle}>{p.creationDate}</td>
                 <td style={tableBorderStyle}>{p.expenseName}</td>
                 <td style={tableBorderStyle}>${p.amount}</td>
-                <td style={tableBorderStyle}>{p.status}</td>
+                <td style={tableBorderStyle}>{p.statusInfo}</td>
               </tr>
             ))}
           </tbody>
@@ -430,6 +492,7 @@ export class Approve_Expenses extends React.Component {
         <div>
           <ReactModal
             isOpen={this.state.showModal}
+            onAfterOpen={this.afterOpenModal}
             onRequestClose={this.handleCloseModal}
           >
             <div>
@@ -452,11 +515,11 @@ export class Approve_Expenses extends React.Component {
               </ul>
               <p><strong>Comments : </strong></p>
               {this.state.comments.length > 0 ? (
-                <div class="panel-group">
+                <div className="panel-group">
                   {this.state.comments.map((c) =>
-                    <div class="panel panel-info" style={{ width: "75%" }}>
-                      <div class="panel-heading">{c.username}<p style={{ float: 'right', color: '#999', fontSize: "smaller" }}>{c.commentedDate}</p></div>
-                      <div class="panel-body">{c.comment}</div>
+                    <div className="panel panel-info" style={{ width: "75%" }}>
+                      <div className="panel-heading">{c.username}<p style={{ float: 'right', color: '#999', fontSize: "smaller" }}>{c.commentedDate}</p></div>
+                      <div className="panel-body">{c.comment}</div>
                     </div>
                   )}
                 </div>
@@ -465,15 +528,17 @@ export class Approve_Expenses extends React.Component {
               <br />
               <form>
                 <div className="form-group col-lg-8">
-                  <label>Comment:</label>
+                  <label id="commentLabel">Comment:</label>
                   <textarea className="form-control" rows="5" id="comment"></textarea>
                   <br />
-                  <div className="alert alert-info" role="alert">
+                  <div id="note" className="alert alert-info" role="alert">
                     <strong>Heads up!</strong> Review all the expense information and attachments before approving this expense.
                     You cannot revert once it is approved.
                     </div>
                   <br />
-                  <button className="btn btn-primary" type="button" onClick={this.handleCloseModal}>Approve</button>
+                  <button id="approve" className="btn btn-primary" type="button" onClick={() => this.handleApproveModal()}>Approve</button>
+                  <button id="decline" className="btn btn-danger" style={{ marginLeft: '1%' }} type="button" onClick={() => this.handleDeclineModal()}>Decline</button>
+                  <button id="review" className="btn btn-info" style={{ marginLeft: '1%' }} type="button" onClick={() => this.handleAddressCommentModal()}>Address Comments</button>
                   <button className="btn btn-link" type="button" onClick={this.handleCloseModal}>Close</button>
                 </div>
               </form>

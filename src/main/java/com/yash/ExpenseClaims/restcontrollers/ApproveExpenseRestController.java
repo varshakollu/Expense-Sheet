@@ -3,13 +3,12 @@ package com.yash.ExpenseClaims.restcontrollers;
 import com.yash.ExpenseClaims.dto.ExpenseDto;
 import com.yash.ExpenseClaims.repositories.ApproveExpenseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.Date;
 import java.util.List;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
 public class ApproveExpenseRestController {
@@ -33,5 +32,10 @@ public class ApproveExpenseRestController {
     public byte[] retrieveExpenseFileFromDB(@PathVariable("expenseID") int expenseID,
                                             @PathVariable("fileID") int fileID){
         return approveExpenseRepository.retrieveSingleFile(expenseID, fileID).get(0);
+    }
+
+    @RequestMapping(value = "/expense/{expenseID}/status", method = POST)
+    public void approvedExpensesForUser(@RequestBody ExpenseDto expenseDto){
+        approveExpenseRepository.changeExpenseStatus(expenseDto);
     }
 }

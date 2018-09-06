@@ -36,8 +36,11 @@ public class ExpenseDto implements Serializable {
     @JsonProperty("amount")
     private Double amount;
 
-    @JsonProperty("status")
-    private String status;
+    @JsonProperty("statusID")
+    private int statusID;
+
+    @JsonProperty("statusInfo")
+    private String statusInfo;
 
     @JsonProperty("fileName")
     private String fileName;
@@ -50,6 +53,12 @@ public class ExpenseDto implements Serializable {
 
     @JsonProperty("files")
     private transient byte[] files;
+
+    @JsonProperty("commentedTime")
+    private Date commentedTime;
+
+    @JsonProperty("comment")
+    private String comment;
 
     public int getExpenseID() {
         return expenseID;
@@ -115,12 +124,20 @@ public class ExpenseDto implements Serializable {
         this.amount = amount;
     }
 
-    public String getStatus() {
-        return status;
+    public int getStatusID() {
+        return statusID;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setStatusID(int statusID) {
+        this.statusID = statusID;
+    }
+
+    public String getStatusInfo() {
+        return statusInfo;
+    }
+
+    public void setStatusInfo(String statusInfo) {
+        this.statusInfo = statusInfo;
     }
 
     public String getFileName() {
@@ -153,5 +170,21 @@ public class ExpenseDto implements Serializable {
 
     public void setFiles(byte[] files) {
         this.files = files;
+    }
+
+    public Date getCommentedTime() {
+        return commentedTime;
+    }
+
+    public void setCommentedTime(Date commentedTime) {
+        this.commentedTime = commentedTime;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 }

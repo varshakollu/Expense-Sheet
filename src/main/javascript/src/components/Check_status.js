@@ -58,7 +58,7 @@ export class Check_status extends React.Component {
       currentExpenseCreationDate: 0,
       currentExpenseName: '',
       currentExpenseAmount: 0,
-      currentStatus: '',
+      currentStatusInfo: '',
       currentComment: '',
       disableSubmit: true
     };
@@ -200,6 +200,7 @@ export class Check_status extends React.Component {
       error: this.handleSubmitFailure,
     });
   }
+  
   handleSubmitSuccess(data) {
     this.setState({
       statuses: data
@@ -231,13 +232,13 @@ export class Check_status extends React.Component {
     this.handlePageChange(1);
   }
 
-  handleOpenModal(currentExpenseID, currentExpenseCreationDate, currentExpenseName, currentExpenseAmount, currentStatus) {
+  handleOpenModal(currentExpenseID, currentExpenseCreationDate, currentExpenseName, currentExpenseAmount, currentStatusInfo) {
     this.setState({
       currentExpenseID: currentExpenseID,
       currentExpenseCreationDate: currentExpenseCreationDate,
       currentExpenseName: currentExpenseName,
       currentExpenseAmount: currentExpenseAmount,
-      currentStatus: currentStatus
+      currentStatusInfo: currentStatusInfo
     });
 
     fetch("/approvals/" + currentExpenseID)
@@ -352,7 +353,7 @@ export class Check_status extends React.Component {
       visible: "none"
     });
 
-    let isSubmittedOrPending = (this.state.currentStatus == "Pending" || this.state.currentStatus == "Submitted");
+    let isSubmittedOrPending = (this.state.currentStatusInfo == "Review Pending" || this.state.currentStatusInfo == "Submitted");
 
     this.state.renderedUsers = this.state.statuses.filter(
       (p) => {
@@ -412,7 +413,7 @@ export class Check_status extends React.Component {
                 <td style={tableBorderStyle}>{p.creationDate}</td>
                 <td style={tableBorderStyle}>${p.amount}</td>
                 <td style={tableBorderStyle}>{p.expenseName}</td>
-                <td style={tableBorderStyle}>{p.status}</td>
+                <td style={tableBorderStyle}>{p.statusInfo}</td>
               </tr>
             ))}
           </tbody>
@@ -433,13 +434,13 @@ export class Check_status extends React.Component {
                 <td style={tableBorderStyle}>
                   <button
                     className="btn btn-link"
-                    onClick={() => { this.handleOpenModal(p.expenseID, p.creationDate, p.expenseName, p.amount, p.status) }}>
+                    onClick={() => { this.handleOpenModal(p.expenseID, p.creationDate, p.expenseName, p.amount, p.statusInfo) }}>
                     <strong>{p.expenseID}</strong></button>
                 </td>
                 <td style={tableBorderStyle}>{p.creationDate}</td>
                 <td style={tableBorderStyle}>${p.amount}</td>
                 <td style={tableBorderStyle}>{p.expenseName}</td>
-                <td style={tableBorderStyle}>{p.status}</td>
+                <td style={tableBorderStyle}>{p.statusInfo}</td>
               </tr>
             ))}
           </tbody>
@@ -574,7 +575,7 @@ export class Check_status extends React.Component {
               <p><strong>Submission date : </strong>{this.state.currentExpenseCreationDate}</p>
               <p><strong>Expense name: </strong>{this.state.currentExpenseName}</p>
               <p><strong>Amount : </strong>{this.state.currentExpenseAmount}</p>
-              <p><strong>Status : </strong>{this.state.currentStatus}</p>
+              <p><strong>Status : </strong>{this.state.currentStatusInfo}</p>
               <p><strong>Attachments : </strong></p>
               <ul className="form-group col-lg-12" style={{ float: 'unset', paddingLeft: "5%" }}>
                 {this.state.files.map((p) =>
@@ -589,11 +590,11 @@ export class Check_status extends React.Component {
 
               <p><strong>Comments : </strong></p>
               {this.state.comments.length > 0 ? (
-                <div class="panel-group">
+                <div className="panel-group">
                   {this.state.comments.map((c) =>
-                    <div class="panel panel-info" style={{ width: "75%" }}>
-                      <div class="panel-heading">{c.username}<p style={{ float: 'right', color: '#999', fontSize: "smaller" }}>{c.commentedDate}</p></div>
-                      <div class="panel-body">{c.comment}</div>
+                    <div className="panel panel-info" style={{ width: "75%" }}>
+                      <div className="panel-heading">{c.username}<p style={{ float: 'right', color: '#999', fontSize: "smaller" }}>{c.commentedDate}</p></div>
+                      <div className="panel-body">{c.comment}</div>
                     </div>
                   )}
                 </div>
