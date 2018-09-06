@@ -280,15 +280,15 @@ export class Upload extends React.Component {
     handleSubmitSuccess(that) {
         Alert.success('Your expense is succesfully uploaded', {
             position: 'top'
-            });
-            that.handleCancel();
+        });
+        that.handleCancel();
     }
 
     handleSubmitFailure(error) {
         Alert.error('There is an error in form submission', {
             position: 'top'
-            });
-            
+        });
+
     }
 
     render() {
@@ -351,11 +351,8 @@ export class Upload extends React.Component {
                     </div>
                     <div className="form-row">
                         <div className="form-group col-lg-8">
-
                             <div>
-                                <table id="uploadTable" border='0' style={{ width: '60%' }}>
-
-                                </table>
+                                <table id="uploadTable" border='0' style={{ width: '60%' }}></table>
                             </div>
                         </div>
                     </div>
