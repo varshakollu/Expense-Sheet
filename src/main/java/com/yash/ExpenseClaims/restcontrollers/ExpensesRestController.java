@@ -49,6 +49,7 @@ public class ExpensesRestController {
                                       @RequestParam("comment") String comment,
                                       @RequestPart("bills") MultipartFile[] multipartFiles) {
         expensesRepository.postAnEmployeeComment(expenseID,username,comment,multipartFiles);
+        emailService.sendEmailToManagerOnEmployeeComments(expenseID);
     }
 
 }

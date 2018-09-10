@@ -44,4 +44,19 @@ public class EmailRepository {
         Map resultMap = namedParameterJdbcTemplate.queryForMap(sql, parameterMap1);
         return resultMap;
     }
+
+    public Map<String,Object> getManagerAndEmployeeInfo(int expenseID) {
+
+        String sql = "SELECT expenseInfo.expenseName, employee.FirstName AS e_firstname, employee.LastName AS e_lastname, employee.UserEmail AS e_email, " +
+                "manager.FirstName AS m_firstname, manager.LastName AS m_lastname, manager.UserEmail AS m_email " +
+                "from users employee INNER JOIN users manager ON manager.username = employee.ManagerName " +
+                "INNER JOIN expenseInfo ON employee.userName = expenseInfo.username " +
+                "where expenseInfo.expenseID = :expenseID;";
+
+        Map<String, Object> parameterMap1 = new HashMap<>();
+        parameterMap1.put("expenseID", expenseID);
+
+        Map resultMap = namedParameterJdbcTemplate.queryForMap(sql, parameterMap1);
+        return resultMap;
+    }
 }

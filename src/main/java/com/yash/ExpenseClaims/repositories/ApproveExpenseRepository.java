@@ -123,5 +123,14 @@ public class ApproveExpenseRepository {
         {
             emailService.sendEmailToAccounting(expenseDto.getUsername(),expenseDto.getExpenseID());
         }
+        else if(expenseDto.getStatusID() == 120)
+        {
+            emailService.sendEmailToEmployeeForDeclinedExpense(expenseDto.getExpenseID());
+        }
+        else if(expenseDto.getStatusID() == 130)
+        {
+            emailService.sendEmailToEmployeeForReviewPending(expenseDto.getExpenseID());
+        }
+
     }
 }
