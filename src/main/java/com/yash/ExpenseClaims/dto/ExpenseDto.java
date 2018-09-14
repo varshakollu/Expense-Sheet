@@ -27,6 +27,12 @@ public class ExpenseDto implements Serializable {
     @JsonProperty("managerName")
     private String managerName;
 
+    @JsonProperty("managerFirstName")
+    private String managerFirstName;
+
+    @JsonProperty("managerLastName")
+    private String managerLastName;
+
     @JsonProperty("expenseName")
     private String expenseName;
 
@@ -98,6 +104,22 @@ public class ExpenseDto implements Serializable {
 
     public void setManagerName(String managerName) {
         this.managerName = managerName;
+    }
+
+    public String getManagerFirstName() {
+        return managerFirstName;
+    }
+
+    public void setManagerFirstName(String managerFirstName) {
+        this.managerFirstName = managerFirstName;
+    }
+
+    public String getManagerLastName() {
+        return managerLastName;
+    }
+
+    public void setManagerLastName(String managerLastName) {
+        this.managerLastName = managerLastName;
     }
 
     public String getExpenseName() {

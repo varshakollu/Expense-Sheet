@@ -81,4 +81,94 @@ public class EmailService {
             e.printStackTrace();
         }
     }
+
+    public void sendEmailToManagerOnEmployeeComments(int expenseID) {
+
+        Map<String, Object> map = emailRepository.getManagerAndEmployeeInfo(expenseID);
+        try {
+            MimeMessage message = sender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message);
+
+            helper.setTo((String) map.get("m_email"));
+            helper.setSubject((String) map.get("expenseName"));
+
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("<html><body>\n" +
+                    "\n" +
+                    "<p>Hello " + map.get("m_firstname") + " " + map.get("m_lastname") + "</p>\n" +
+                    "\n" +
+                    "\n" +
+                    "<p>" + map.get("e_firstname") + " " + map.get("e_lastname") + " has updated an expense record that has already uploaded. </p>\n" +
+                    "\n" +
+                    "\n" +
+                    "<p> To review and approve this expense, <a href=\"http://localhost:8080\">Click here</a></p>" +
+                    "</body>\n" +
+                    "</html>");
+            helper.setText(stringBuilder.toString(), true);
+
+            sender.send(message);
+
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendEmailToEmployeeForReviewPending(int expenseID) {
+        Map<String, Object> map = emailRepository.getManagerAndEmployeeInfo(expenseID);
+        try {
+            MimeMessage message = sender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message);
+
+            helper.setTo((String) map.get("e_email"));
+            helper.setSubject((String) map.get("expenseName"));
+
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("<html><body>\n" +
+                    "\n" +
+                    "<p>Hello " + map.get("e_firstname") + " " + map.get("e_lastname") + "</p>\n" +
+                    "\n" +
+                    "\n" +
+                    "<p>" + map.get("m_firstname") + " " + map.get("m_lastname") + " has reviewed the expense record you uploaded and requested for more information. </p>\n" +
+                    "\n" +
+                    "\n" +
+                    "<p> To address the comments for this expense, <a href=\"http://localhost:8080\">Click here</a></p>" +
+                    "</body>\n" +
+                    "</html>");
+            helper.setText(stringBuilder.toString(), true);
+
+            sender.send(message);
+
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendEmailToEmployeeForDeclinedExpense(int expenseID) {
+        Map<String, Object> map = emailRepository.getManagerAndEmployeeInfo(expenseID);
+        try {
+            MimeMessage message = sender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message);
+
+            helper.setTo((String) map.get("e_email"));
+            helper.setSubject((String) map.get("expenseName"));
+
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("<html><body>\n" +
+                    "\n" +
+                    "<p>Hello " + map.get("e_firstname") + " " + map.get("e_lastname") + "</p>\n" +
+                    "\n" +
+                    "\n" +
+                    "<p>" + map.get("m_firstname") + " " + map.get("m_lastname") + " has reviewed and declined the expense record you uploaded. </p>\n" +
+                    "\n" +
+                    "\n" +
+                    "<p> To upload a new expense, <a href=\"http://localhost:8080\">Click here</a></p>" +
+                    "</body>\n" +
+                    "</html>");
+            helper.setText(stringBuilder.toString(), true);
+
+            sender.send(message);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
 }

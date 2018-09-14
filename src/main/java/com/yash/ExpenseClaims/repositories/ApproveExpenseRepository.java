@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.sql.Blob;
@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Service
+@Repository
 public class ApproveExpenseRepository {
 
     @Autowired
@@ -98,8 +98,7 @@ public class ApproveExpenseRepository {
         return list;
     }
 
-    public void changeExpenseStatus(ExpenseDto expenseDto) {
-
+    public void updateStatusIntoExpenseInfo(ExpenseDto expenseDto){
         String UpdateSql = "UPDATE expenseinfo SET statusID = :statusID where expenseinfo.expenseID= :expenseID";
 
         Map<String, Object> parameterMap = new HashMap<>();
@@ -107,7 +106,9 @@ public class ApproveExpenseRepository {
         parameterMap.put("expenseID", expenseDto.getExpenseID());
 
         namedParameterJdbcTemplate.update(UpdateSql, parameterMap);
+    }
 
+    public void insertCommentsIntoCommentsTable(ExpenseDto expenseDto){
         String sql = "INSERT INTO comments (expenseID, username, commentedDate, comment) VALUES" +
                 "(:expenseID, :username, :commentedDate, :comment);";
 
@@ -118,10 +119,5 @@ public class ApproveExpenseRepository {
         parameterMap1.put("comment", expenseDto.getComment());
 
         namedParameterJdbcTemplate.update(sql, parameterMap1);
-
-        if(expenseDto.getStatusID() == 110)
-        {
-            emailService.sendEmailToAccounting(expenseDto.getUsername(),expenseDto.getExpenseID());
-        }
     }
 }
