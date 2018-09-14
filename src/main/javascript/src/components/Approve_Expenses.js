@@ -274,7 +274,7 @@ export class Approve_Expenses extends React.Component {
     this.state.renderedUsers = this.state.statuses.filter(
       (p) => {
         if (this.state.searchValue) {
-          return p.firstName.toLowerCase().indexOf(this.state.searchValue) !== -1 || p.lastName.toLowerCase().indexOf(this.state.searchValue) !== -1 || p.expenseName.toLowerCase().indexOf(this.state.searchValue) !== -1 || p.status.toLowerCase().indexOf(this.state.searchValue) !== -1;
+          return p.firstName.toLowerCase().indexOf(this.state.searchValue) !== -1 || p.lastName.toLowerCase().indexOf(this.state.searchValue) !== -1 || p.expenseName.toLowerCase().indexOf(this.state.searchValue) !== -1 || p.statusInfo.toLowerCase().indexOf(this.state.searchValue) !== -1;
         }
         else {
           return p;
@@ -538,7 +538,7 @@ export class Approve_Expenses extends React.Component {
                   <br />
                   <button id="approve" className="btn btn-primary" type="button" onClick={() => this.handleApproveModal()}>Approve</button>
                   <button id="decline" className="btn btn-danger" style={{ marginLeft: '1%' }} type="button" onClick={() => this.handleDeclineModal()}>Decline</button>
-                  <button id="review" className="btn btn-info" style={{ marginLeft: '1%' }} type="button" onClick={() => this.handleAddressCommentModal()}>Address Comments</button>
+                  <button id="review" className="btn btn-info" style={{ marginLeft: '1%' }} type="button" onClick={() => this.handleAddressCommentModal()}>Comment</button>
                   <button className="btn btn-link" type="button" onClick={this.handleCloseModal}>Close</button>
                 </div>
               </form>

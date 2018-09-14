@@ -90,7 +90,6 @@ public class EmailService {
             MimeMessageHelper helper = new MimeMessageHelper(message);
 
             helper.setTo((String) map.get("m_email"));
-            helper.setCc((String) map.get("e_email"));
             helper.setSubject((String) map.get("expenseName"));
 
             StringBuilder stringBuilder = new StringBuilder();
@@ -121,7 +120,6 @@ public class EmailService {
             MimeMessageHelper helper = new MimeMessageHelper(message);
 
             helper.setTo((String) map.get("e_email"));
-            helper.setCc((String) map.get("m_email"));
             helper.setSubject((String) map.get("expenseName"));
 
             StringBuilder stringBuilder = new StringBuilder();
@@ -152,7 +150,6 @@ public class EmailService {
             MimeMessageHelper helper = new MimeMessageHelper(message);
 
             helper.setTo((String) map.get("e_email"));
-            helper.setCc((String) map.get("m_email"));
             helper.setSubject((String) map.get("expenseName"));
 
             StringBuilder stringBuilder = new StringBuilder();
@@ -170,7 +167,6 @@ public class EmailService {
             helper.setText(stringBuilder.toString(), true);
 
             sender.send(message);
-
         } catch (MessagingException e) {
             e.printStackTrace();
         }

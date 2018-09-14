@@ -35,7 +35,7 @@ export class Upload extends React.Component {
         this.handleCancel = this.handleCancel.bind(this);
         this.isExcel = this.isExcel.bind(this);
         this.browseButtonClicked = this.browseButtonClicked.bind(this);
-        this.isNotExecutableFile = this.isNotExecutableFile.bind(this);
+        this.isPDForExcel = this.isPDForExcel.bind(this);
         this.addRemoveButtonEvents = this.addRemoveButtonEvents.bind(this);
         this.removeExcelFilesAndSaveBills = this.removeExcelFilesAndSaveBills.bind(this);
         this.saveExcelFileAndRequestForBills = this.saveExcelFileAndRequestForBills.bind(this);
@@ -65,18 +65,17 @@ export class Upload extends React.Component {
     handleUploadFilesChange(event) {
         let uploadedFilesList = event.target.files;
         for (let i = 0; i < uploadedFilesList.length; i++) {
-            //not executable and size<2MB
-            if (this.isNotExecutableFile(uploadedFilesList[i]) && this.validateSize(uploadedFilesList[i])) {
+            if (this.isPDForExcel(uploadedFilesList[i]) && this.validateSize(uploadedFilesList[i])) {
                 this.state.files.push(uploadedFilesList[i]);
             }
         }
         this.updateTableHTML(this.state.files);
     }
-    isNotExecutableFile(file) {
-        if (file.type != "application/x-msdownload") {
+    isPDForExcel(file) {
+        if (file.type == "application/pdf" || file.type == "application/vnd.ms-excel" || file.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
             return true;
         } else {
-            alert("Executable files are not allowed");
+            alert("Only PDF and Excel format files are allowed to upload.");
             return false;
         }
     }
@@ -291,7 +290,6 @@ export class Upload extends React.Component {
     }
 
     render() {
-
         const hiddenFileControlStyle = css({
             visible: "none"
         });
@@ -332,7 +330,8 @@ export class Upload extends React.Component {
                                 disabled={this.state.disableUpload}
                                 onChange={this.handleUploadFilesChange}
                                 multiple
-                                required />
+                                required
+                            />
 
                             <input id="FileControl"
                                 className="form-control-file"

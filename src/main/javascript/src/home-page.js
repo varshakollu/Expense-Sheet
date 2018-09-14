@@ -7,6 +7,7 @@ import { Check_status } from "./components/Check_status";
 import { Approve_Expenses } from "./components/Approve_Expenses";
 import { Unauthorized_page } from "./components/Unauthorized_page";
 import { Help } from "./components/Help";
+import { Accountant_Approvals } from "./components/Accountant_Approvals";
 
 class ExpenseSheet extends React.Component {
     constructor(props) {
@@ -18,6 +19,7 @@ class ExpenseSheet extends React.Component {
     render() {
         debugger;
         const isAdmin = (props.userRoles.toUpperCase() == ("ROLE_admin").toUpperCase());
+        const isAccountant = (props.userRoles.toUpperCase() == ("ROLE_ACCOUNTANT").toUpperCase());
         return (
             <HashRouter>
                 <div>
@@ -27,6 +29,13 @@ class ExpenseSheet extends React.Component {
                     <Route path={"/approve"} render={() => (
                         isAdmin ? (
                             <Approve_Expenses />
+                        ) : (
+                                <Redirect to="/unauthorized" />
+                            )
+                    )} />
+                    <Route path={"/accountantApprovals"} render={() => (
+                        isAccountant ? (
+                            <Accountant_Approvals />
                         ) : (
                                 <Redirect to="/unauthorized" />
                             )
