@@ -67,7 +67,6 @@ export class Accountant_Approvals extends React.Component {
   }
 
   searchInputChange(event) {
-    debugger;
     this.searchValue = event.target.value.toLowerCase();
     this.setState({ searchValue: this.searchValue });
     this.handlePageChange(1);
@@ -133,7 +132,6 @@ export class Accountant_Approvals extends React.Component {
   }
 
   handleSubmitFailure(error) {
-    console.log(error);
     this.setState({ showModal: false });
   }
 
@@ -165,8 +163,8 @@ export class Accountant_Approvals extends React.Component {
       currentExpenseCreationDate: currentExpenseCreationDate,
       currentExpenseName: currentExpenseName,
       currentExpenseAmount: currentExpenseAmount,
-      currentManagerFirstName : currentManagerFirstName,
-      currentManagerLastName : currentManagerLastName,
+      currentManagerFirstName: currentManagerFirstName,
+      currentManagerLastName: currentManagerLastName,
       currentStatusInfo: currentStatusInfo
     });
 
@@ -194,7 +192,7 @@ export class Accountant_Approvals extends React.Component {
   }
 
   afterOpenModal() {
-    if (this.state.currentStatusInfo == "Sent to Accounting" || this.state.currentStatusInfo == "Declined") {
+    if (this.state.currentStatusInfo == "Approved" || this.state.currentStatusInfo == "Declined by Accountant") {
       document.getElementById("approve").style.display = "none";
       document.getElementById("decline").style.display = "none";
       document.getElementById("review").style.display = "none";
@@ -214,42 +212,40 @@ export class Accountant_Approvals extends React.Component {
       const comments = document.getElementById("comment").value;
       const postData = {
         "expenseID": this.state.currentExpenseID,
+        "expenseName": this.state.currentExpenseName,
         "username": currentLoggedinUsername,
         "comment": comments,
         "statusID": statusID
       };
       $.ajax({
         type: "POST",
-        url: "/expense/" + this.state.currentExpenseID + "/status",
+        url: "/accountantApprovals/" + this.state.currentExpenseID + "/status",
         data: JSON.stringify(postData),
         contentType: "application/json",
         success: this.handleSubmitSuccessExpense,
         error: this.handleSubmitFailure,
       });
       this.handleCloseModal();
-
     }
   }
 
   handleSubmitSuccessExpense() {
-    console.log("success");
     window.location.reload(true);
   }
 
   handleApproveModal() {
-    this.handleStatusChangeInDB(110);
+    this.handleStatusChangeInDB(140);
   }
 
   handleDeclineModal() {
-    this.handleStatusChangeInDB(120);
+    this.handleStatusChangeInDB(150);
   }
 
   handleAddressCommentModal() {
-    this.handleStatusChangeInDB(130);
+    this.handleStatusChangeInDB(160);
   }
 
   handleFileDisplay(fileID, fileName, fileType) {
-
     fetch("/approvals/" + this.state.currentExpenseID + "/file/" + fileID)
       .then(function (response) {
         return response.blob();
@@ -319,7 +315,7 @@ export class Accountant_Approvals extends React.Component {
             <tr>
               <th style={tableBorderStyle} scope="col" >Expense ID</th>
               <th style={tableBorderStyle} scope="col" >Submission Date</th>
-              <th style={tableBorderStyle} scope="col" >Employee</th>           
+              <th style={tableBorderStyle} scope="col" >Employee</th>
               <th style={tableBorderStyle} scope="col">Expense Name</th>
               <th style={tableBorderStyle} scope="col" >Total Amount</th>
               <th style={tableBorderStyle} scope="col" >Approving Manager</th>
@@ -331,7 +327,7 @@ export class Accountant_Approvals extends React.Component {
               <tr scope="row">
                 <td style={tableBorderStyle}>{p.expenseID}</td>
                 <td style={tableBorderStyle}>{p.creationDate}</td>
-                <td style={tableBorderStyle}>{p.firstName} {p.lastName}</td>              
+                <td style={tableBorderStyle}>{p.firstName} {p.lastName}</td>
                 <td style={tableBorderStyle}>{p.expenseName}</td>
                 <td style={tableBorderStyle}>${p.amount}</td>
                 <td style={tableBorderStyle}>{p.managerFirstName} {p.managerLastName}</td>
@@ -345,7 +341,7 @@ export class Accountant_Approvals extends React.Component {
             <tr>
               <th style={tableBorderStyle} scope="col" >Expense ID</th>
               <th style={tableBorderStyle} scope="col" >Submission Date</th>
-              <th style={tableBorderStyle} scope="col" >Employee</th>             
+              <th style={tableBorderStyle} scope="col" >Employee</th>
               <th style={tableBorderStyle} scope="col">Expense Name</th>
               <th style={tableBorderStyle} scope="col" >Total Amount</th>
               <th style={tableBorderStyle} scope="col" >Approving Manager</th>
@@ -362,7 +358,7 @@ export class Accountant_Approvals extends React.Component {
                     <strong>{p.expenseID}</strong></button>
                 </td>
                 <td style={tableBorderStyle}>{p.creationDate}</td>
-                <td style={tableBorderStyle}>{p.firstName} {p.lastName}</td>              
+                <td style={tableBorderStyle}>{p.firstName} {p.lastName}</td>
                 <td style={tableBorderStyle}>{p.expenseName}</td>
                 <td style={tableBorderStyle}>${p.amount}</td>
                 <td style={tableBorderStyle}>{p.managerFirstName} {p.managerLastName}</td>

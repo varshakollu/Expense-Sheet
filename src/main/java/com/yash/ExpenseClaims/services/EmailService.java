@@ -1,5 +1,6 @@
 package com.yash.ExpenseClaims.services;
 
+import com.yash.ExpenseClaims.dto.ExpenseDto;
 import com.yash.ExpenseClaims.repositories.EmailRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -51,7 +52,7 @@ public class EmailService {
         }
     }
 
-    public void sendEmailToAccounting(String managerName, int expenseID) {
+    public void sendEmailToAccounting(int expenseID) {
 
         Map<String, Object> map = emailRepository.getExpenseInfo(expenseID);
         try {
@@ -162,6 +163,37 @@ public class EmailService {
                     "\n" +
                     "\n" +
                     "<p> To upload a new expense, <a href=\"http://localhost:8080\">Click here</a></p>" +
+                    "</body>\n" +
+                    "</html>");
+            helper.setText(stringBuilder.toString(), true);
+
+            sender.send(message);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void sendEmailToManagerOnAccountantComments(ExpenseDto expenseDto) {
+        Map<String, Object> map = emailRepository.getManagerAndAccountantInfo(expenseDto.getExpenseID(),expenseDto.getUsername());
+
+        try {
+            MimeMessage message = sender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message);
+
+            helper.setTo((String) map.get("m_email"));
+            helper.setSubject(expenseDto.getExpenseName());
+
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("<html><body>\n" +
+                    "\n" +
+                    "<p>Hello " + map.get("m_firstname") + " " + map.get("m_lastname") + "</p>\n" +
+                    "\n" +
+                    "\n" +
+                    "<p>" + map.get("a_firstname") + " " + map.get("a_lastname") + ", from Accounting team has reviewed and commented on the expense record you have approved. </p>\n" +
+                    "\n" +
+                    "\n" +
+                    "<p> To Address these comments, <a href=\"http://localhost:8080\">Click here</a></p>" +
                     "</body>\n" +
                     "</html>");
             helper.setText(stringBuilder.toString(), true);

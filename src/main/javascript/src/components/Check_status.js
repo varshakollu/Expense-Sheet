@@ -200,7 +200,7 @@ export class Check_status extends React.Component {
       error: this.handleSubmitFailure,
     });
   }
-  
+
   handleSubmitSuccess(data) {
     this.setState({
       statuses: data
@@ -353,7 +353,7 @@ export class Check_status extends React.Component {
       visible: "none"
     });
 
-    let isSubmittedOrPending = (this.state.currentStatusInfo == "Review Pending" || this.state.currentStatusInfo == "Submitted");
+    let isSubmittedOrPending = (this.state.currentStatusInfo == "Commented by Manager" || this.state.currentStatusInfo == "Submitted");
 
     this.state.renderedUsers = this.state.statuses.filter(
       (p) => {

@@ -8,7 +8,7 @@ const propTypes = {
   id: PropTypes.string,
   className: PropTypes.string,
   buttonText: PropTypes.string,
-  img : PropTypes.string.isRequired,
+  img: PropTypes.string.isRequired,
   dates: PropTypes.string.isRequired,
 };
 
@@ -55,7 +55,6 @@ class ReactHTMLTable_ToExcel extends Component {
     const img = document.getElementById(this.props.img).outerHTML;
     const dates = String(this.props.dates);
     const uri = 'data:application/vnd.ms-excel;base64,';
-    debugger;
     const template =
       '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-mic' +
       'rosoft-com:office:excel" xmlns="https://www.w3.org/TR/html401"><head><meta cha' +
@@ -71,7 +70,6 @@ class ReactHTMLTable_ToExcel extends Component {
       table,
     };
 
-    // If IE11
     if (window.navigator.msSaveOrOpenBlob) {
       const fileData = [
         `${'<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-mic' + 'rosoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta cha' + 'rset="UTF-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:Exce' + 'lWorksheet><x:Name>'}${sheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/>' + '</x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></' + 'xml><![endif]--></head><body>'}<div>${img}<br><b>${dates}</b></div><div>${table}</div></body></html>`,

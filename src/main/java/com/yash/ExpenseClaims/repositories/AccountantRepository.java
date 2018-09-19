@@ -36,7 +36,7 @@ public class AccountantRepository {
                 "FROM ExpenseInfo INNER JOIN users employee ON ExpenseInfo.userName = employee.username " +
                 "INNER JOIN users manager ON manager.username = employee.ManagerName " +
                 "INNER JOIN expensestatus ON ExpenseInfo.statusID = expensestatus.statusID " +
-                "where expensestatus.statusInfo = 'Sent to Accounting' and " +
+                "where expensestatus.statusID IN (110,140,150,160) and " +
                 "ExpenseInfo.creationDate between :startDate and :endDate;";
 
         Map<String, Object> parameterMap = new HashMap<>();
@@ -61,4 +61,5 @@ public class AccountantRepository {
         });
         return list;
     }
+
 }

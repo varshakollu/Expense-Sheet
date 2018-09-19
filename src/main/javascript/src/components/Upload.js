@@ -160,7 +160,6 @@ export class Upload extends React.Component {
             }
             if (this.state.countOfExcelFiles != 1) {
                 if (this.state.countOfExcelFiles < 1) {
-                    //save the bills in the state, request for expense sheet
                     let confirmMessage = confirm("Please upload an Expense sheet in .xls or .xlsx or .csv format.");
                     if (confirmMessage) {
                         this.saveAllBillsAndRequestForExcelFile(confirmMessage);
@@ -168,7 +167,6 @@ export class Upload extends React.Component {
                         this.saveAllBillsAndRequestForExcelFile(confirmMessage);
                     }
                 }
-                // If multiple excel files are found, remove excel files and save bills in the state.
                 else if (this.state.countOfExcelFiles > 1) {
                     let confirmMessage = confirm("Please upload only one Expense sheet in .xls or .xlsx format.");
                     if (confirmMessage) {
@@ -179,9 +177,7 @@ export class Upload extends React.Component {
                 }
             }
 
-            // This will execute when only one expense sheet is uploaded
             else if (this.state.countOfExcelFiles == 1 && this.state.countOfBills < 1) {
-                // save the excel sheet in the state, request for bills
                 let confirmMessage = confirm("Please upload all appropriate bills.");
                 if (confirmMessage) {
                     this.saveExcelFileAndRequestForBills(confirmMessage);
@@ -235,7 +231,6 @@ export class Upload extends React.Component {
             name: tempExpenseName,
             disableUpload: false
         });
-        //Remove all excel files and save bills temporarily.
         let tempArray = this.state.files;
         let that = this;
         let excelFoundInTheArray = true;

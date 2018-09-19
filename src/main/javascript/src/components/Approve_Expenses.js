@@ -114,7 +114,7 @@ export class Approve_Expenses extends React.Component {
       "startDate": from,
       "endDate": to
     };
-  
+
     $.ajax({
       contentType: "application/json",
       type: "GET",
@@ -133,7 +133,6 @@ export class Approve_Expenses extends React.Component {
   }
 
   handleSubmitFailure(error) {
-    console.log(error);
     this.setState({ showModal: false });
   }
 
@@ -192,13 +191,20 @@ export class Approve_Expenses extends React.Component {
   }
 
   afterOpenModal() {
-    if (this.state.currentStatusInfo == "Sent to Accounting" || this.state.currentStatusInfo == "Declined") {
-      document.getElementById("approve").style.display = "none";
-      document.getElementById("decline").style.display = "none";
-      document.getElementById("review").style.display = "none";
-      document.getElementById("comment").style.display = "none";
-      document.getElementById("commentLabel").style.display = "none";
-      document.getElementById("note").style.display = "none";
+    if (this.state.currentStatusInfo == "Submitted" || this.state.currentStatusInfo == "Commented by Manager") {
+      document.getElementById("approve").style.display = "inline";
+      document.getElementById("decline").style.display = "inline";
+      document.getElementById("review").style.display = "inline";
+      document.getElementById("comment").style.display = "block";
+      document.getElementById("commentLabel").style.display = "block";
+      document.getElementById("note").style.display = "block";
+    }
+    else if (this.state.currentStatusInfo == "Commented  by Accountant") {
+      document.getElementById("commentToUser").style.display = "inline";
+      document.getElementById("commentToAccountant").style.display = "inline";
+      document.getElementById("comment").style.display = "block";
+      document.getElementById("commentLabel").style.display = "block";
+      document.getElementById("note").style.display = "block";
     }
   }
 
@@ -212,11 +218,12 @@ export class Approve_Expenses extends React.Component {
       const comments = document.getElementById("comment").value;
       const postData = {
         "expenseID": this.state.currentExpenseID,
+        "expenseName": this.state.currentExpenseName,
         "username": currentLoggedinUsername,
         "comment": comments,
         "statusID": statusID
       };
-       $.ajax({
+      $.ajax({
         type: "POST",
         url: "/expense/" + this.state.currentExpenseID + "/status",
         data: JSON.stringify(postData),
@@ -225,12 +232,10 @@ export class Approve_Expenses extends React.Component {
         error: this.handleSubmitFailure,
       });
       this.handleCloseModal();
-      
     }
   }
 
   handleSubmitSuccessExpense() {
-    console.log("success");
     window.location.reload(true);
   }
 
@@ -528,17 +533,19 @@ export class Approve_Expenses extends React.Component {
               <br />
               <form>
                 <div className="form-group col-lg-8">
-                  <label id="commentLabel">Comment:</label>
-                  <textarea className="form-control" rows="5" id="comment"></textarea>
+                  <label id="commentLabel" style={{ display: 'none' }} >Comment:</label>
+                  <textarea className="form-control" rows="5" id="comment" style={{ display: 'none' }} ></textarea>
                   <br />
-                  <div id="note" className="alert alert-info" role="alert">
+                  <div id="note" className="alert alert-info" role="alert" style={{ display: 'none' }} >
                     <strong>Heads up!</strong> Review all the expense information and attachments before approving this expense.
                     You cannot revert once it is approved.
                     </div>
                   <br />
-                  <button id="approve" className="btn btn-primary" type="button" onClick={() => this.handleApproveModal()}>Approve</button>
-                  <button id="decline" className="btn btn-danger" style={{ marginLeft: '1%' }} type="button" onClick={() => this.handleDeclineModal()}>Decline</button>
-                  <button id="review" className="btn btn-info" style={{ marginLeft: '1%' }} type="button" onClick={() => this.handleAddressCommentModal()}>Comment</button>
+                  <button id="approve" className="btn btn-primary" style={{ display: 'none' }} type="button" onClick={() => this.handleApproveModal()}>Approve</button>
+                  <button id="decline" className="btn btn-danger" style={{ marginLeft: '1%', display: 'none' }} type="button" onClick={() => this.handleDeclineModal()}>Decline</button>
+                  <button id="review" className="btn btn-info" style={{ marginLeft: '1%', display: 'none' }} type="button" onClick={() => this.handleAddressCommentModal()}>Comment</button>
+                  <button id="commentToUser" className="btn btn-info" style={{ marginLeft: '1%', display: 'none' }} type="button" onClick={() => this.handleAddressCommentModal()}>Comment to User</button>
+                  <button id="commentToAccountant" className="btn btn-info" style={{ marginLeft: '1%', display: 'none' }} type="button" onClick={() => this.handleApproveModal()}>Comment to Accountant</button>
                   <button className="btn btn-link" type="button" onClick={this.handleCloseModal}>Close</button>
                 </div>
               </form>
