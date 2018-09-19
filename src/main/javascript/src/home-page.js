@@ -12,12 +12,10 @@ import { Accountant_Approvals } from "./components/Accountant_Approvals";
 class ExpenseSheet extends React.Component {
     constructor(props) {
         super(props);
-        console.log(window)
         props = window.props;
     }
 
     render() {
-        debugger;
         const isAdmin = (props.userRoles.toUpperCase() == ("ROLE_admin").toUpperCase());
         const isAccountant = (props.userRoles.toUpperCase() == ("ROLE_ACCOUNTANT").toUpperCase());
         return (

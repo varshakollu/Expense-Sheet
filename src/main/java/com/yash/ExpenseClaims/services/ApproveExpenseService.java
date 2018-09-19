@@ -21,7 +21,6 @@ public class ApproveExpenseService {
     private EmailService emailService;
 
     public List<ExpenseDto> retrieveAllExpenses(String managername, Date startDate, Date endDate) {
-        approveExpenseRepository.retrieveAllExpenses(managername, startDate, endDate);
         return approveExpenseRepository.retrieveAllExpenses(managername, startDate, endDate);
     }
 
@@ -45,7 +44,7 @@ public class ApproveExpenseService {
         int expenseStatus = expenseDto.getStatusID();
         switch (expenseStatus) {
             case 110:
-                emailService.sendEmailToAccounting(expenseDto.getUsername(), expenseDto.getExpenseID());
+                emailService.sendEmailToAccounting(expenseDto.getExpenseID());
                 break;
             case 120:
                 emailService.sendEmailToEmployeeForDeclinedExpense(expenseDto.getExpenseID());

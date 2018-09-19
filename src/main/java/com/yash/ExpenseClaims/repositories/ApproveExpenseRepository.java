@@ -98,7 +98,7 @@ public class ApproveExpenseRepository {
         return list;
     }
 
-    public void updateStatusIntoExpenseInfo(ExpenseDto expenseDto){
+    public void updateStatusIntoExpenseInfo(ExpenseDto expenseDto) {
         String UpdateSql = "UPDATE expenseinfo SET statusID = :statusID where expenseinfo.expenseID= :expenseID";
 
         Map<String, Object> parameterMap = new HashMap<>();
@@ -108,7 +108,7 @@ public class ApproveExpenseRepository {
         namedParameterJdbcTemplate.update(UpdateSql, parameterMap);
     }
 
-    public void insertCommentsIntoCommentsTable(ExpenseDto expenseDto){
+    public void insertCommentsIntoCommentsTable(ExpenseDto expenseDto) {
         String sql = "INSERT INTO comments (expenseID, username, commentedDate, comment) VALUES" +
                 "(:expenseID, :username, :commentedDate, :comment);";
 
@@ -119,5 +119,14 @@ public class ApproveExpenseRepository {
         parameterMap1.put("comment", expenseDto.getComment());
 
         namedParameterJdbcTemplate.update(sql, parameterMap1);
+    }
+
+    public String getExpenseStatusbyExpenseID(int expenseID) {
+        String sql = "SELECT expensestatus.statusInfo from expenseInfo JOIN expensestatus ON expenseInfo.statusID = expensestatus.statusID where expenseInfo.expenseID = :expenseID";
+
+        Map<String, Object> parameterMap1 = new HashMap<>();
+        parameterMap1.put("expenseID", expenseID);
+
+        return namedParameterJdbcTemplate.queryForObject(sql, parameterMap1, String.class);
     }
 }

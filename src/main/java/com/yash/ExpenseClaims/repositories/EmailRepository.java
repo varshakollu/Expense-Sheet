@@ -59,4 +59,21 @@ public class EmailRepository {
         Map resultMap = namedParameterJdbcTemplate.queryForMap(sql, parameterMap1);
         return resultMap;
     }
+
+    public Map<String,Object> getManagerAndAccountantInfo(int expenseID, String username) {
+
+        String sqlForManagerInfo = "SELECT FirstName AS m_firstname,LastName AS m_lastname,UserEmail AS m_email from users where username =" +
+                "(select managerName from expenseinfo where expenseID = :expenseID)";
+        Map<String, Object> parameterMap1 = new HashMap<>();
+        parameterMap1.put("expenseID", expenseID);
+        Map resultMap = namedParameterJdbcTemplate.queryForMap(sqlForManagerInfo, parameterMap1);
+
+        String sqlForAccountantInfo = "SELECT FirstName AS a_firstname,LastName AS a_lastname,UserEmail AS a_email from users where username = :username";
+        Map<String, Object> parameterMap2 = new HashMap<>();
+        parameterMap2.put("username", username);
+
+        resultMap.putAll(namedParameterJdbcTemplate.queryForMap(sqlForAccountantInfo,parameterMap2));
+
+        return resultMap;
+    }
 }

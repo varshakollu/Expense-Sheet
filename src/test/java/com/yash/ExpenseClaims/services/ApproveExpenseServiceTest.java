@@ -33,7 +33,6 @@ public class ApproveExpenseServiceTest {
         when(repository.retrieveAllExpenses(MANGER, startDate, endDate)).thenReturn(expectedOuptut);
 
         List<ExpenseDto> actualOutput = service.retrieveAllExpenses(MANGER, startDate, endDate);
-
         assertEquals(expectedOuptut, actualOutput);
     }
 
