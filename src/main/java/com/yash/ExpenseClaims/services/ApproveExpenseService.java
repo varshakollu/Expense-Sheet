@@ -5,9 +5,6 @@ import com.yash.ExpenseClaims.repositories.ApproveExpenseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
-import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -32,7 +29,6 @@ public class ApproveExpenseService {
         return approveExpenseRepository.retrieveSingleFile(expenseID, fileID).get(0);
     }
 
-    @Transactional
     public void changeExpenseStatus(ExpenseDto expenseDto) {
         approveExpenseRepository.updateStatusIntoExpenseInfo(expenseDto);
         approveExpenseRepository.insertCommentsIntoCommentsTable(expenseDto);

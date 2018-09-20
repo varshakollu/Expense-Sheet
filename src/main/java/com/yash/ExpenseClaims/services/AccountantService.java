@@ -32,8 +32,4 @@ public class AccountantService {
             emailService.sendEmailToManagerOnAccountantComments(expenseDto);
         }
     }
-
-    public String getExpenseStatusbyExpenseID(int expenseID) {
-        return approveExpenseRepository.getExpenseStatusbyExpenseID(expenseID);
-    }
 }
