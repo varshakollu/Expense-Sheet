@@ -299,10 +299,11 @@ export class Check_status extends React.Component {
       formData.append("expenseID", this.state.currentExpenseID);
       formData.append("username", props.userName);
       formData.append("comment", this.state.currentComment);
-
+      formData.append("status", this.state.currentStatusInfo);
       for (let i = 0; i < this.state.bills.length; i++) {
         formData.append("bills", this.state.bills[i]);
       }
+
 
       $.ajax({
         url: "/expenses/" + this.state.currentExpenseID + "/comments",
