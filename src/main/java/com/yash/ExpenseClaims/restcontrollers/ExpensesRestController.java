@@ -48,7 +48,8 @@ public class ExpensesRestController {
     public void postAnEmployeeComment(@PathVariable("expenseID") int expenseID,
                                       @RequestParam("username") String username,
                                       @RequestParam("comment") String comment,
+                                      @RequestParam("status") String status,
                                       @RequestPart("bills") MultipartFile[] multipartFiles) {
-        expenseService.postAnEmployeeComment(expenseID, username, comment, multipartFiles);
+        expenseService.postAnEmployeeComment(expenseID, username, comment, status, multipartFiles);
     }
 }

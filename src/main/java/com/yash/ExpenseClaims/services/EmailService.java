@@ -59,7 +59,7 @@ public class EmailService {
             MimeMessage message = sender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message);
 
-            helper.setTo("varshakollu@gmail.com"); //replace by ap_yash@yash.com
+            helper.setTo("yashaccounting.team@gmail.com");
             helper.setSubject((String) map.get("expenseName"));
 
             StringBuilder stringBuilder = new StringBuilder();
@@ -172,7 +172,6 @@ public class EmailService {
             e.printStackTrace();
         }
     }
-
 
     public void sendEmailToManagerOnAccountantComments(ExpenseDto expenseDto) {
         Map<String, Object> map = emailRepository.getManagerAndAccountantInfo(expenseDto.getExpenseID(),expenseDto.getUsername());

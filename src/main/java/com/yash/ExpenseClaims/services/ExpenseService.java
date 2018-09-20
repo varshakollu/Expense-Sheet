@@ -28,13 +28,14 @@ public class ExpenseService {
         return expensesRepository.retrieveAllExpenses(username, startDate, endDate);
     }
 
-
     public List<CommentDto> retrieveAllComments(int expenseID) {
         return expensesRepository.retrieveAllComments(expenseID);
     }
 
-    public void postAnEmployeeComment(int expenseID, String username, String comment, MultipartFile[] multipartFiles) {
+    public void postAnEmployeeComment(int expenseID, String username, String comment, String status, MultipartFile[] multipartFiles) {
         expensesRepository.postAnEmployeeComment(expenseID, username, comment, multipartFiles);
-        emailService.sendEmailToManagerOnEmployeeComments(expenseID);
+        if (!(status.equalsIgnoreCase("Submitted"))) {
+            emailService.sendEmailToManagerOnEmployeeComments(expenseID);
+        }
     }
 }
